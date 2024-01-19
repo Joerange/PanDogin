@@ -51,9 +51,8 @@ osThreadId StartTaskHandle;
 osThreadId BlueteethTaskHandle;
 osThreadId NRFTaskHandle;
 osThreadId Posture_TaskHandle;
-osThreadId LegControl_LeftHandle;
-osThreadId LegControl_righHandle;
 osThreadId GO1Init_TaskHandle;
+osThreadId GO1_OutputHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -64,9 +63,8 @@ void StartDebug(void const * argument);
 void BlueTeeth_RemoteControl(void const * argument);
 void NRF_RemoteControl(void const * argument);
 void Posture(void const * argument);
-void legControl_Left(void const * argument);
-void legcontrol_right(void const * argument);
 void GO1Init(void const * argument);
+void GO1_outTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -113,17 +111,13 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(Posture_Task, Posture, osPriorityNormal, 0, 512);
   Posture_TaskHandle = osThreadCreate(osThread(Posture_Task), NULL);
 
-  /* definition and creation of LegControl_Left */
-  osThreadDef(LegControl_Left, legControl_Left, osPriorityNormal, 0, 512);
-  LegControl_LeftHandle = osThreadCreate(osThread(LegControl_Left), NULL);
-
-  /* definition and creation of LegControl_righ */
-  osThreadDef(LegControl_righ, legcontrol_right, osPriorityNormal, 0, 512);
-  LegControl_righHandle = osThreadCreate(osThread(LegControl_righ), NULL);
-
   /* definition and creation of GO1Init_Task */
   osThreadDef(GO1Init_Task, GO1Init, osPriorityLow, 0, 128);
   GO1Init_TaskHandle = osThreadCreate(osThread(GO1Init_Task), NULL);
+
+  /* definition and creation of GO1_Output */
+  osThreadDef(GO1_Output, GO1_outTask, osPriorityAboveNormal, 0, 512);
+  GO1_OutputHandle = osThreadCreate(osThread(GO1_Output), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -132,8 +126,7 @@ void MX_FREERTOS_Init(void) {
     vTaskSuspend(BlueteethTaskHandle);
     vTaskSuspend(NRFTaskHandle);
     vTaskSuspend(Posture_TaskHandle);
-    vTaskSuspend(LegControl_LeftHandle);
-    vTaskSuspend(LegControl_righHandle);
+    vTaskSuspend(GO1_OutputHandle);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -225,47 +218,6 @@ void Posture(void const * argument)
   /* USER CODE END Posture */
 }
 
-/* USER CODE BEGIN Header_legControl_Left */
-/**
-* @brief Function implementing the LegControl_Left thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_legControl_Left */
-void legControl_Left(void const * argument)
-{
-  /* USER CODE BEGIN legControl_Left */
-
-  /* Infinite loop */
-  for(;;)
-  {
-      leg_pos_controll02();
-      leg_pos_controll();
-    osDelay(2);
-  }
-  /* USER CODE END legControl_Left */
-}
-
-/* USER CODE BEGIN Header_legcontrol_right */
-/**
-* @brief Function implementing the LegControl_righ thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_legcontrol_right */
-void legcontrol_right(void const * argument)
-{
-  /* USER CODE BEGIN legcontrol_right */
-  /* Infinite loop */
-  for(;;)
-  {
-      Speed_Controll();
-
-    osDelay(2);
-  }
-  /* USER CODE END legcontrol_right */
-}
-
 /* USER CODE BEGIN Header_GO1Init */
 /**
 * @brief Function implementing the GO1Init_Task thread.
@@ -292,8 +244,7 @@ void GO1Init(void const * argument)
     printf("GO1 Init Ready\n");
     osDelay(3);
 
-    vTaskResume(LegControl_LeftHandle);
-//    vTaskResume(LegControl_righHandle);
+    vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
     vTaskSuspend(NULL);
   /* Infinite loop */
@@ -302,6 +253,27 @@ void GO1Init(void const * argument)
     osDelay(1);
   }
   /* USER CODE END GO1Init */
+}
+
+/* USER CODE BEGIN Header_GO1_outTask */
+/**
+* @brief Function implementing the GO1_Output thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_GO1_outTask */
+void GO1_outTask(void const * argument)
+{
+  /* USER CODE BEGIN GO1_outTask */
+  /* Infinite loop */
+  for(;;)
+  {
+      leg_pos_controll02();
+      leg_pos_controll();
+
+    osDelay(2);
+  }
+  /* USER CODE END GO1_outTask */
 }
 
 /* Private application code --------------------------------------------------*/
