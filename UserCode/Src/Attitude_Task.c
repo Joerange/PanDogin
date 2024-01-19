@@ -12,12 +12,15 @@ int Global_IMU_Control = 0;
 
 void StandUp_Posture(void)
 {
+    AllLegsSpeedLimit(SpeedMode_FAST);
+    ChangeGainOfPID(5.0f,0,0.6f,0);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
 }
 
 void LieDown_Posture(void)
 {
+    AllLegsSpeedLimit(SpeedMode_VERYSLOW);
     for(int i = 1;i < 9;i ++)
     {
         AngleWant_MotorX[i] = 0;
@@ -32,6 +35,7 @@ void Test_Move(void)
 //实际运行Trot步态
 void Trot(float direction,int8_t kind)
 {
+    AllLegsSpeedLimit(SpeedMode_FAST);
     switch(kind)
     {
         case 0://大步Trot
@@ -42,13 +46,8 @@ void Trot(float direction,int8_t kind)
             break;
         case 1://小步Trot
             NewHeartbeat = 5;
-            ChangeGainOfPID(5.0f,0,0.6f,0);
+            ChangeGainOfPID(3.8f,0,0.6f,0);
             YawControl(yawwant, &state_detached_params[11], direction);
-//            Change_SinStateDetachedParams(&state_detached_params[11],11,1,22.0f,28.0f,
-//            10.0f,10.0f,0.2f,5.0f);
-//            Change_SinStateDetachedParams(&state_detached_params[11],11,2,22.0f,28.0f,
-//                                          10.0f,10.0f,0.2f,5.0f)ol
-//            YawControl(yawwant, &state_detached_params[11],direction);
             gait_detached(state_detached_params[11],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
@@ -64,20 +63,21 @@ void Walk(float direction,uint8_t speed)
 //    YawControl(yawwant,&state_detached_params[1],direction);
 //    Yaw_PID_Loop.SumError_limit = 2500;Yaw_PID_Loop.Output_limit = 45;
     NewHeartbeat = 4;
-    ChangeGainOfPID(60,0,0.6f,0);
+    ChangeGainOfPID(3.5f,0,0.6f,0);
     gait_detached(state_detached_params[1],0.0,0.75,0.5,0.25,direction,direction,direction,direction);
 }
 //转弯步态
 void Turn(int state_flag)
 {
     NewHeartbeat = 5;
+    AllLegsSpeedLimit(SpeedMode_VERYFAST);
     ChangeGainOfPID(4.0f,0,0.6f,0);
     switch (state_flag) {
         case 'l':
-            state_detached_params[8].detached_params_0.step_length = -20.0f;
-            state_detached_params[8].detached_params_1.step_length = -20.0f;
-            state_detached_params[8].detached_params_2.step_length = 20.0f;
-            state_detached_params[8].detached_params_3.step_length = 20.0f;
+            state_detached_params[8].detached_params_0.step_length = -10.0f;
+            state_detached_params[8].detached_params_1.step_length = -10.0f;
+            state_detached_params[8].detached_params_2.step_length = 10.0f;
+            state_detached_params[8].detached_params_3.step_length = 10.0f;
             break;
         case 'r':
             state_detached_params[8].detached_params_0.step_length = 20.0f;

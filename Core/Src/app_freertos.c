@@ -176,8 +176,10 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
+      if(gpstate == 10 || gpstate == 11)
+          usart_printf("%f\r\n",AngleWant_MotorX[2]);
 
-    osDelay(5);
+    osDelay(2);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
@@ -230,13 +232,13 @@ void GO1Init(void const * argument)
   /* USER CODE BEGIN GO1Init */
     MOTOR_Send_Init(); //初始化电机发送帧头
     Eight_PID_Init();//八个电机PID结构体初始化
-    ChangeGainOfPID(3.0f,0,0.03f,0.05f);//初始化pid
+    ChangeGainOfPID(4.0f,0,0.03f,0.05f);//初始化pid
 
     Get_motor_began_pos();       //获得各个电机的初始位
     EndPosture();                //锁住电机
 
     PID_Init(&Yaw_PID_Loop);
-    Yaw_PID_Loop.P = 2.0f;
+    Yaw_PID_Loop.P = 5.0f;
     Yaw_PID_Loop.D = 0.2f;
     Yaw_PID_Loop.SumError_limit = 2500;
     Yaw_PID_Loop.Output_limit = 15;//陀螺仪结构体初始化
@@ -268,7 +270,6 @@ void GO1_outTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-      leg_pos_controll02();
       leg_pos_controll();
 
     osDelay(2);

@@ -59,29 +59,22 @@ void Remote_Controller(void)
 {
     switch (gpstate) {
         case 1:
-            AllLegsSpeedLimit(SpeedMode_VERYFAST);
             StandUp_Posture();
-//            usart_printf("%d\r\n",gpstate);
             break;
         case 3:
-            AllLegsSpeedLimit(SpeedMode_VERYSLOW);
             LieDown_Posture();
             break;
         case 6:
-            AllLegsSpeedLimit(SpeedMode_VERYFAST);
-            Turn('l');
-            break;
-        case 7:
-            AllLegsSpeedLimit(SpeedMode_VERYFAST);
             Turn('r');
             break;
+        case 7:
+            Turn('l');
+            break;
         case 10:
-            AllLegsSpeedLimit(SpeedMode_FAST);
-            Trot(Backward,1);
+            Trot(Forward,1);
             break;
         case 11:
-            AllLegsSpeedLimit(SpeedMode_FAST);
-            Trot(Forward,1);
+            Trot(Backward,1);
         default:
             break;
     }

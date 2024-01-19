@@ -12,7 +12,7 @@ float step_angle[4] = {0};
 float times = 0.0f;
 float x,y;
 uint8_t reverse_move_flag = 0;
-
+float steplen = 0;
 //用于复制上方状态数组作为永恒基准。
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
 //调试时用来改变生成的轨迹参数
@@ -164,7 +164,7 @@ void CartesianToTheta(void)
 */
 void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId)
 {
-    //t=times*5/1000，即每1s变化1
+//t=times*5/1000，即每1s变化1
     //获取正弦函数的所要配置的参数
     float stanceHeight = params.stance_height;////狗底盘离地高度
     float downAMP = params.down_amp;////负峰值
@@ -192,7 +192,7 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
         x0 = (gp/flightPercent)*stepLength - stepLength/2.0f;////从-stepLength/2到+stepLength/2，移动时间不随stepLength改变，故stepLength越大实际移动速度越快。
         y0 = -upAMP*sin(PI*gp/flightPercent) + stanceHeight;////围绕stanceHeight为基础进行正弦波动。同样是upAMP越大移动速度越快。
     }
-    //足尖支撑相
+        //足尖支撑相
     else ////摆动总是从正弦轨迹的起始位置处执行。
     {
         float percentBack = (gp-flightPercent)/(1.0f-flightPercent);//percentBack与(gp/flightPercent)是一个道理
@@ -202,6 +202,7 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
     ////经过坐标系转换后得到最终结果(angle目前都是0，从而x=x0，y=y0)
     x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
     y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
+
 }
 /*
 * NAME: CoupledMoveLeg
@@ -320,10 +321,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 6,//踱步
-                {18.0, 0.0, 3.00, 1.50, 0.25, 2.0},
-                {18.0, 0.0, 3.00, 1.50, 0.25, 2.0},
-                {18.0, 0.0, 3.00, 1.50, 0.25, 2.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {18.0, 0.0, 3.00, 1.50, 0.25, 2.0}
+                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},
+                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},
+                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0}
         },
 
         {
@@ -352,10 +353,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 8,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {15.0, 6.25, 8.5, 8.0, 0.25, 6.5},
-                {15.0, 6.25, 8.5, 8.0, 0.25, 6.5},
-                {15.0, 6.25, 8.5, 8.0, 0.25, 6.5},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0, 6.25, 8.5, 8.0, 0.25, 6.5}
+                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},
+                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},
+                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0}
         },
 
         {
@@ -376,10 +377,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 11,//小步Tro
-                {15.0, 5.0,  4.0, 3.0, 0.2, 2.0},
-                {15.0, 5.0,  4.0, 3.0, 0.2, 2.0},
-                {15.0, 5.0,  4.0, 3.0, 0.2, 2.0},
-                {15.0, 5.0,  4.0, 3.0, 0.2, 2.0}
+                {14.3f, 5.0f,  3.0f, 1.0f, 0.19f, 2.0f},
+                {14.3f, 5.0f,  3.0f, 1.0f, 0.19f, 2.0f},
+                {14.3f, 5.0f,  3.0f, 1.0f, 0.19f, 2.0f},
+                {14.3f, 5.0f,  3.0f, 1.0f, 0.19f, 2.0f}
         }
 };
 
@@ -464,8 +465,8 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 200;//左腿步长减小
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 200;//右腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长减小
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长增加
         //步长限幅
         normal_step_left  = ((normal_step_left>StepLenthMax_Half)  ? StepLenthMax_Half : normal_step_left);
         normal_step_right = ((normal_step_right>StepLenthMax_Half) ? StepLenthMax_Half : normal_step_right);

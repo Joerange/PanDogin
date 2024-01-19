@@ -63,6 +63,8 @@ extern float Leg1_Delay,Leg2_Delay,Leg3_Delay,Leg4_Delay;
 extern DetachedParam state_detached_params[StatesMaxNum];
 extern DetachedParam StateDetachedParams_Copy[];
 extern float AngleWant_MotorX[9];
+extern float x,y;
+extern float steplen;
 
 void Get_Target(int theta1,int theta2);
 void SetCoupledThetaPositionAll(void);
