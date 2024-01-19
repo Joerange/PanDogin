@@ -78,5 +78,8 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
 void CoupledMoveLeg(float t, GaitParams params,float gait_offset, float leg_direction, int LegId, float angle);
 void AttitudeControl(float roll_set,float pitch_set,float yaw_set,DetachedParam *State_Detached_Params,int direction);
 void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction);
+void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime);
+void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime);
+void SetCoupledCartesianPosition(int LegId,float x_want,float y_want);
 
 #endif //MY_SCUDOG_ATTITUDE_SLOVE_H

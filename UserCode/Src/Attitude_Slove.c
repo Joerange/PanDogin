@@ -478,3 +478,39 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
     }
 }
+
+//直接设置所需x，y位置进行电机控制
+void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
+{
+    x=x_want;
+    y=y_want;
+    CartesianToTheta();
+    SetCoupledThetaPosition(LegId);
+}
+
+//所有腿的直角坐标控制
+void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
+{
+    SetCoupledCartesianPosition(0,x_want,y_want);
+    SetCoupledCartesianPosition(2,x_want,y_want);
+    SetCoupledCartesianPosition(1,x_want,y_want);
+    SetCoupledCartesianPosition(3,x_want,y_want);
+    osDelay(delaytime);//此处未知HAL_Delay是否出错
+}
+
+//所有腿的极坐标控制
+void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime)
+{
+    float x_want,y_want;
+    if(polar_angle>=0)
+    {
+        x_want = -polar_diameter*cos(polar_angle*PI/180);
+        y_want =  polar_diameter*sin(polar_angle*PI/180);
+    }
+    else
+    {
+        x_want =  polar_diameter*cos(polar_angle*PI/180);
+        y_want = -polar_diameter*sin(polar_angle*PI/180);
+    }
+    SetCartesianPositionAll_Delay(x_want,y_want,delaytime);
+}
