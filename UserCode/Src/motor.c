@@ -459,17 +459,6 @@ void AllLegsTorqueLimit(float torquelimit)
 void leg_pos_controll(void )
 {
     //将目标角度放入各个电机的角度环并进行角度环PID计算
-    //no.1 leg
-    SetPoint(&AngleLoop[1],AngleWant_MotorX[1],1);
-    SetPoint(&AngleLoop[2],AngleWant_MotorX[2],2);
-    PID_PosLocCalc(&AngleLoop[1],end_pos[1]);
-    PID_PosLocCalc(&AngleLoop[2],end_pos[2]);
-
-    //no.2 leg
-    SetPoint(&AngleLoop[3],AngleWant_MotorX[3],3);
-    SetPoint(&AngleLoop[4],AngleWant_MotorX[4],4);
-    PID_PosLocCalc(&AngleLoop[3],end_pos[3]);
-    PID_PosLocCalc(&AngleLoop[4],end_pos[4]);
 
     //no3.leg
     SetPoint(&AngleLoop[5],AngleWant_MotorX[5],5);
@@ -483,18 +472,13 @@ void leg_pos_controll(void )
     PID_PosLocCalc(&AngleLoop[7],end_pos[7]);
     PID_PosLocCalc(&AngleLoop[8],end_pos[8]);
 
+//    if(gpstate == 10 || gpstate == 11)
+//        usart_printf("%f\n",AngleLoop[1].Out_put);
+
+
     //如果只使用位置环，则需要直接将位置环的输出送给电机
     if(OnlyPosLoop)
     {
-        //输出
-        motor_speed_controll_with_kw(1,AngleLoop[1].Out_put,speed_kp);
-        osDelay(1);
-        motor_speed_controll_with_kw(2,AngleLoop[2].Out_put,speed_kp);
-        osDelay(1);
-        motor_speed_controll_with_kw(3,AngleLoop[3].Out_put,speed_kp);
-        osDelay(1);
-        motor_speed_controll_with_kw(4,AngleLoop[4].Out_put,speed_kp);
-        osDelay(1);
         //输出
         motor_speed_controll_with_kw(5,AngleLoop[5].Out_put,speed_kp);
         osDelay(1);

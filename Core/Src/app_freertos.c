@@ -49,8 +49,6 @@
 /* USER CODE END Variables */
 osThreadId StartTaskHandle;
 osThreadId BlueteethTaskHandle;
-osThreadId NRFTaskHandle;
-osThreadId Posture_TaskHandle;
 osThreadId GO1Init_TaskHandle;
 osThreadId GO1_OutputHandle;
 
@@ -61,8 +59,6 @@ osThreadId GO1_OutputHandle;
 
 void StartDebug(void const * argument);
 void BlueTeeth_RemoteControl(void const * argument);
-void NRF_RemoteControl(void const * argument);
-void Posture(void const * argument);
 void GO1Init(void const * argument);
 void GO1_outTask(void const * argument);
 
@@ -103,14 +99,6 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(BlueteethTask, BlueTeeth_RemoteControl, osPriorityAboveNormal, 0, 256);
   BlueteethTaskHandle = osThreadCreate(osThread(BlueteethTask), NULL);
 
-  /* definition and creation of NRFTask */
-  osThreadDef(NRFTask, NRF_RemoteControl, osPriorityAboveNormal, 0, 256);
-  NRFTaskHandle = osThreadCreate(osThread(NRFTask), NULL);
-
-  /* definition and creation of Posture_Task */
-  osThreadDef(Posture_Task, Posture, osPriorityNormal, 0, 512);
-  Posture_TaskHandle = osThreadCreate(osThread(Posture_Task), NULL);
-
   /* definition and creation of GO1Init_Task */
   osThreadDef(GO1Init_Task, GO1Init, osPriorityLow, 0, 128);
   GO1Init_TaskHandle = osThreadCreate(osThread(GO1Init_Task), NULL);
@@ -121,11 +109,9 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-//    vTaskResume(StartTaskHandle);
+    vTaskResume(StartTaskHandle);
     vTaskSuspend(GO1Init_TaskHandle);
     vTaskSuspend(BlueteethTaskHandle);
-    vTaskSuspend(NRFTaskHandle);
-    vTaskSuspend(Posture_TaskHandle);
     vTaskSuspend(GO1_OutputHandle);
   /* USER CODE END RTOS_THREADS */
 
@@ -176,48 +162,10 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
-      if(gpstate == 10 || gpstate == 11)
-          usart_printf("%f\r\n",AngleWant_MotorX[2]);
 
-    osDelay(2);
-  }
-  /* USER CODE END BlueTeeth_RemoteControl */
-}
-
-/* USER CODE BEGIN Header_NRF_RemoteControl */
-/**
-* @brief Function implementing the NRFTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_NRF_RemoteControl */
-void NRF_RemoteControl(void const * argument)
-{
-  /* USER CODE BEGIN NRF_RemoteControl */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END NRF_RemoteControl */
-}
-
-/* USER CODE BEGIN Header_Posture */
-/**
-* @brief Function implementing the Posture_Task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_Posture */
-void Posture(void const * argument)
-{
-  /* USER CODE BEGIN Posture */
-  /* Infinite loop */
-  for(;;)
-  {
     osDelay(5);
   }
-  /* USER CODE END Posture */
+  /* USER CODE END BlueTeeth_RemoteControl */
 }
 
 /* USER CODE BEGIN Header_GO1Init */
@@ -248,6 +196,7 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
+//    vTaskResume(Posture_TaskHandle);
     vTaskSuspend(NULL);
   /* Infinite loop */
   for(;;)
@@ -271,8 +220,9 @@ void GO1_outTask(void const * argument)
   for(;;)
   {
       leg_pos_controll();
+      leg_pos_controll02();
 
-    osDelay(2);
+    osDelay(5);
   }
   /* USER CODE END GO1_outTask */
 }

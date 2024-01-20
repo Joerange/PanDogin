@@ -13,7 +13,6 @@ int Global_IMU_Control = 0;
 void StandUp_Posture(void)
 {
     AllLegsSpeedLimit(SpeedMode_FAST);
-    ChangeGainOfPID(5.0f,0,0.6f,0);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
 }
