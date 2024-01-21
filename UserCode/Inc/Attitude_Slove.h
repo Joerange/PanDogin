@@ -31,12 +31,17 @@
 #define LegStandLenth 18.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位
-#define StepLenthMin 0.0f
-#define StepLenthMax (2*LegLenthExtremeMax*0.866f*0.9f) //大小大概在45cm
+#define StepLenthMin 60.0f
+#define StepLenthMax 80.0f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
 #define StatesMaxNum 20
 
+#define LengthChange_Kp 5.0f
+#define freChange_Kp 1.67f
+
+#define freMAX 4.0f
+#define freMIN 2.0f
 
 typedef struct
 {

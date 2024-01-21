@@ -163,6 +163,8 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
+//      usart_printf("%f,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],state_detached_params[11].detached_params_0.freq,state_detached_params[11].detached_params_2.freq);
+
     osDelay(5);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
@@ -186,9 +188,9 @@ void GO1Init(void const * argument)
     EndPosture();                //锁住电机
 
     PID_Init(&Yaw_PID_Loop);
-    Yaw_PID_Loop.P = 5.0f;
-    Yaw_PID_Loop.D = 0.2f;
-    Yaw_PID_Loop.SumError_limit = 2500;
+    Yaw_PID_Loop.P = 1000.0f;
+    Yaw_PID_Loop.D = 10.0f;
+    Yaw_PID_Loop.SumError_limit = 4000;
     Yaw_PID_Loop.Output_limit = 15;//陀螺仪结构体初始化
 
     printf("GO1 Init Ready\n");
@@ -196,7 +198,6 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
-//    vTaskResume(Posture_TaskHandle);
     vTaskSuspend(NULL);
   /* Infinite loop */
   for(;;)

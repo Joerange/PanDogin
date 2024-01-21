@@ -13,6 +13,7 @@ float times = 0.0f;
 float x,y;
 uint8_t reverse_move_flag = 0;
 float steplen = 0;
+
 //用于复制上方状态数组作为永恒基准。
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
 //调试时用来改变生成的轨迹参数
@@ -264,119 +265,19 @@ void Get_Target(int theta1,int theta2)
  */
 DetachedParam state_detached_params[StatesMaxNum] = {
 
-        {
-                0,//大步MARCH
-                //2022.7.14步态
-                {14.9, 14.29, 2.5, 1.30, 0.17, 2.0},
-                {14.9, 14.29, 2.5, 1.30, 0.17, 2.0},
-                {14.9, 14.29, 2.5, 1.30, 0.17, 2.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {14.9, 14.29, 2.5, 1.30, 0.17, 2.0}
-        },
 
         {
-                1,//WALK
-                {15.0, 14.00, 2.0, 1.30, 0.125, 1.4},//walk步态必须要求flight_percent（即摆动相）在0.25-0范围以内，这里取0.2，可尝试取0.125试试。
-                {15.0, 14.00, 2.0, 1.30, 0.125, 1.4},
-                {15.0, 14.00, 2.0, 1.30, 0.125, 1.4},
-                {15.0, 14.00, 2.0, 1.30, 0.125, 1.4}
+                0,//转弯（在转弯函数中会调整该步态以实现转弯）
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f}
         },
+
+
 
         {
-                2,//跷跷板   没有强制，而是靠PID调节
-                {14.0, 14.0, 2.00, 2.00, 0.25, 0.5}, //小步子可以迈上去
-                {14.0, 14.0, 2.00, 2.00, 0.25, 0.5},
-                {14.0, 14.0, 2.00, 2.00, 0.25, 0.5},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {14.0, 14.0, 2.00, 2.00, 0.25, 0.5}
-        },
-
-        {   //跷跷板  这个参数之前比赛测试时是可以爬上去的（强制让前后腿的高度不一样，而不是PID）
-                3,
-                {14.0, 14.0, 3.00, 2.00, 0.25, 1.0}, //小步子可以迈上去
-                {19.0, 14.0, 3.00, 2.00, 0.25, 1.0},
-                {14.0, 14.0, 3.00, 2.00, 0.25, 1.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {19.0, 14.0, 3.00, 2.00, 0.25, 1.0}
-        },
-
-        {
-                4, //卵石路
-                {16.0, 14.0, 2.50, 2.00, 0.25, 2.0},
-                {16.0, 14.0, 2.50, 2.00, 0.25, 2.0},
-                {16.0, 14.0, 2.50, 2.00, 0.25, 2.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {16.0, 14.0, 2.50, 2.00, 0.25, 2.0}
-        },
-
-        {
-                5,//竞速
-//		/*使用Trot步态时的参量*/
-//        {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},
-//        {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},
-//        {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-//        {18.0, 14.0, 3.00, 1.50, 0.25, 2.0}
-                /*使用Gallop步态时的参量*/
-                {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},
-                {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},
-                {18.0, 14.0, 3.00, 1.50, 0.25, 2.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {18.0, 14.0, 3.00, 1.50, 0.25, 2.0}
-        },
-
-        {
-                6,//踱步
-                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},
-                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},
-                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {18.0, 0.0, 3.00, 1.50, 0.25, 1.0}
-        },
-
-        {
-                7,//用于走独木桥的步态
-//        {14.9, 6.25, 3.7, 1.30, 0.35, 3.4},
-//        {14.9, 6.25, 3.7, 1.30, 0.35, 3.4},
-//        {14.9, 6.25, 3.7, 1.30, 0.35, 3.4},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-//        {14.9, 6.25, 3.7, 1.30, 0.35, 3.4}
-//        {18, 25, 6.7, 1.30, 0.35, 1.5},
-//        {18, 25, 6.7, 1.30, 0.35, 1.5},
-//        {18, 25, 6.7, 1.30, 0.35, 1.5},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-//        {18, 25, 6.7, 1.30, 0.35, 1.5}
-//        {14, 15, 3.7, 1.30, 0.35, 1.5},//首次尝试可通过单木桥，就是要求速度比较慢。
-//        {14, 15, 3.7, 1.30, 0.35, 1.5},
-//        {14, 15, 3.7, 1.30, 0.35, 1.5},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-//        {14, 15, 3.7, 1.30, 0.35, 1.5}
-//        {14, 15, 2.7, 1.30, 0.35, 0.8},//首次尝试可通过单木桥，就是要求速度比较慢。
-//        {14, 15, 2.7, 1.30, 0.35, 0.8},
-//        {14, 15, 2.7, 1.30, 0.35, 0.8},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-//        {14, 15, 2.7, 1.30, 0.35, 0.8}
-                {12, 13, 1.3, 1.30, 0.32, 0.8},//首次尝试可通过单木桥，就是要求速度比较慢。
-                {12, 13, 1.3, 1.30, 0.32, 0.8},
-                {12, 13, 1.3, 1.30, 0.32, 0.8},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {12, 13, 1.3, 1.30, 0.32, 0.8}
-        },
-
-        {
-                8,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},
-                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},
-                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0, 6.25, 3.0, 3.0, 0.25, 3.0}
-        },
-
-        {
-                9,//遥控器调试用基准步态（基于Trot）
-                {15.0, 14.0, 2.50, 1.5, 0.35, 2.0}, // 15.0, 14.0, 2.50, 1.50, 0.35, 2.0(矮但稳）
-                {15.0, 14.0, 2.50, 1.5, 0.35, 2.0}, // 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0, 14.0, 2.50, 1.5, 0.35, 2.0},
-                {15.0, 14.0, 2.50, 1.5, 0.35, 2.0}
-        },
-
-        {
-                10,//遥控器调试用步态，基于walk
-                {16.0, 17.00, 3.0, 3.00, 0.20, 0.4},//walk步态必须要求flight_percent（即摆动相）在0.25-0范围以内，这里取0.2，可尝试取0.125试试。
-                {16.0, 17.00, 3.0, 3.00, 0.20, 0.4},
-                {16.0, 17.00, 3.0, 3.00, 0.20, 0.4},
-                {16.0, 17.00, 3.0, 3.00, 0.20, 0.4}
-        },
-
-        {
-                11,//小步Tro
+                1,//小步Trot
                 {15.0f, 70.0f,  14.0f, 5.0f, 0.34f, 3.0f},
                 {15.0f, 70.0f,  14.0f, 5.0f, 0.34f, 3.0f},
                 {15.0f, 70.0f,  14.0f, 5.0f, 0.34f, 3.0f},
@@ -384,78 +285,79 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         }
 };
 
-/*
-	功能：基于IMU角度数据的姿态控制
-	float roll_set,float pitch_set,float yaw_set：欧拉角（横滚、俯仰、水平）的目标值。
-	GaitParams params：输入state_detached_params[i].detached_params_j，即某种步态的某条腿的姿态。该参数作为一种状态基准。j取0即可，应为四条腿参数都是一样的。
-	paramID：用来将对状态基准做出改变后的新步态信息来调整state_detached_params[paramID]的值。paramID应与上一条中的i一样。
-	问题：该函数充分暴露出了我们目前的控制的欠缺，即各个步态中，四条腿的参数配置都是一样的。
-*/
-void AttitudeControl(float roll_set,float pitch_set,float yaw_set,DetachedParam *State_Detached_Params,int direction)
-{
-    float normal_step_left,normal_step_right;
-    float normal_stance_0,normal_stance_1,normal_stance_2,normal_stance_3;
-    if(IMU_Control_Flag)
-    {
-        /*******IMUのPID相关*******/
-        //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度;另外还有可能是为了微调Yaw）
-        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
-        SetPoint_IMU(&Pitch_PID_Loop,pitch_set);
-        SetPoint_IMU(&Roll_PID_Loop,roll_set);
-        //PID计算（利用到了串口解算出的IMU_EulerAngle进行位置式PID计算）
-        PID_PosLocCalc(&Pitch_PID_Loop,IMU_EulerAngle.EulerAngle[Pitch]);
-        PID_PosLocCalc(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
-        PID_PosLocCalc(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
-        if(direction != 1)
-        {
-            Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
-        }
-        //死区设置
-        if((Yaw_PID_Loop.Out_put<1.0f) && (Yaw_PID_Loop.Out_put>-1.0f)) 	Yaw_PID_Loop.Out_put=0;
-        if((Pitch_PID_Loop.Out_put<1.0f) && (Pitch_PID_Loop.Out_put>-1.0f)) Pitch_PID_Loop.Out_put=0;
-        if((Roll_PID_Loop.Out_put<1.0f) && (Roll_PID_Loop.Out_put>-1.0f)) 	Roll_PID_Loop.Out_put=0;
-        /**********步态控制*********/
-        //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长减小
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put ;//右腿步长增加
-        //步长限幅
-        normal_step_left  = ((normal_step_left>StepLenthMax - 2) ? StepLenthMax- 2 : normal_step_left);
-        normal_step_right = ((normal_step_right>StepLenthMax -2) ? StepLenthMax- 2 : normal_step_right);
-        normal_step_left  = ((normal_step_left<StepLenthMin - 2) ? StepLenthMin- 2 : normal_step_left);
-        normal_step_right = ((normal_step_right<StepLenthMin- 2) ? StepLenthMin- 2 : normal_step_right);
-        //最终赋值
-        State_Detached_Params->detached_params_0.step_length = normal_step_left;
-        State_Detached_Params->detached_params_1.step_length = normal_step_left;
-        State_Detached_Params->detached_params_2.step_length = normal_step_right;
-        State_Detached_Params->detached_params_3.step_length = normal_step_right;
-        //腿号0123分别对应左前、左后、右前、右后，即1、2对应左腿，3、4对应右腿。注意配置对，否则正反馈。
-        //狗腿长度控制（还有一种思路是只增不减，即保证最基本的情况，这样可以避免变数太多而增加调节负担）
-        normal_stance_0 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.stance_height + Pitch_PID_Loop.Out_put - Roll_PID_Loop.Out_put;//先+后－，是为了抑制前倾和右翻。
-        normal_stance_1 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_1.stance_height - Pitch_PID_Loop.Out_put - Roll_PID_Loop.Out_put;
-        normal_stance_2 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_2.stance_height + Pitch_PID_Loop.Out_put + Roll_PID_Loop.Out_put;
-        normal_stance_3 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_3.stance_height - Pitch_PID_Loop.Out_put + Roll_PID_Loop.Out_put;
-        //狗腿长度上限控制
-        normal_stance_0  = ( (normal_stance_0>=LegLenthMax) ? LegLenthMax : normal_stance_0 );
-        normal_stance_1  = ( (normal_stance_1>=LegLenthMax) ? LegLenthMax : normal_stance_1 );
-        normal_stance_2  = ( (normal_stance_2>=LegLenthMax) ? LegLenthMax : normal_stance_2 );
-        normal_stance_3  = ( (normal_stance_3>=LegLenthMax) ? LegLenthMax : normal_stance_3 );
-        //狗腿长度下限控制
-        normal_stance_0  = ( (normal_stance_0<=LegLenthMin) ? LegLenthMin : normal_stance_0 );
-        normal_stance_1  = ( (normal_stance_1<=LegLenthMin) ? LegLenthMin : normal_stance_1 );
-        normal_stance_2  = ( (normal_stance_2<=LegLenthMin) ? LegLenthMin : normal_stance_2 );
-        normal_stance_3  = ( (normal_stance_3<=LegLenthMin) ? LegLenthMin : normal_stance_3 );
-        //Pitch和Roll输出给stance_height参数
-        State_Detached_Params->detached_params_0.stance_height = normal_stance_0;
-        State_Detached_Params->detached_params_1.stance_height = normal_stance_1;
-        State_Detached_Params->detached_params_2.stance_height = normal_stance_2;
-        State_Detached_Params->detached_params_3.stance_height = normal_stance_3;
-    }
-}
+///*
+//	功能：基于IMU角度数据的姿态控制
+//	float roll_set,float pitch_set,float yaw_set：欧拉角（横滚、俯仰、水平）的目标值。
+//	GaitParams params：输入state_detached_params[i].detached_params_j，即某种步态的某条腿的姿态。该参数作为一种状态基准。j取0即可，应为四条腿参数都是一样的。
+//	paramID：用来将对状态基准做出改变后的新步态信息来调整state_detached_params[paramID]的值。paramID应与上一条中的i一样。
+//	问题：该函数充分暴露出了我们目前的控制的欠缺，即各个步态中，四条腿的参数配置都是一样的。
+//*/
+//void AttitudeControl(float roll_set,float pitch_set,float yaw_set,DetachedParam *State_Detached_Params,int direction)
+//{
+//    float normal_step_left,normal_step_right;
+//    float normal_stance_0,normal_stance_1,normal_stance_2,normal_stance_3;
+//    if(IMU_Control_Flag)
+//    {
+//        /*******IMUのPID相关*******/
+//        //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度;另外还有可能是为了微调Yaw）
+//        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
+//        SetPoint_IMU(&Pitch_PID_Loop,pitch_set);
+//        SetPoint_IMU(&Roll_PID_Loop,roll_set);
+//        //PID计算（利用到了串口解算出的IMU_EulerAngle进行位置式PID计算）
+//        PID_PosLocCalc(&Pitch_PID_Loop,IMU_EulerAngle.EulerAngle[Pitch]);
+//        PID_PosLocCalc(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
+//        PID_PosLocCalc(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
+//        if(direction != 1)
+//        {
+//            Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
+//        }
+//        //死区设置
+//        if((Yaw_PID_Loop.Out_put<1.0f) && (Yaw_PID_Loop.Out_put>-1.0f)) 	Yaw_PID_Loop.Out_put=0;
+//        if((Pitch_PID_Loop.Out_put<1.0f) && (Pitch_PID_Loop.Out_put>-1.0f)) Pitch_PID_Loop.Out_put=0;
+//        if((Roll_PID_Loop.Out_put<1.0f) && (Roll_PID_Loop.Out_put>-1.0f)) 	Roll_PID_Loop.Out_put=0;
+//        /**********步态控制*********/
+//        //Yaw输出给步长参数
+//        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长减小
+//        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put ;//右腿步长增加
+//        //步长限幅
+//        normal_step_left  = ((normal_step_left>StepLenthMax - 2) ? StepLenthMax- 2 : normal_step_left);
+//        normal_step_right = ((normal_step_right>StepLenthMax -2) ? StepLenthMax- 2 : normal_step_right);
+//        normal_step_left  = ((normal_step_left<StepLenthMin - 2) ? StepLenthMin- 2 : normal_step_left);
+//        normal_step_right = ((normal_step_right<StepLenthMin- 2) ? StepLenthMin- 2 : normal_step_right);
+//        //最终赋值
+//        State_Detached_Params->detached_params_0.step_length = normal_step_left;
+//        State_Detached_Params->detached_params_1.step_length = normal_step_left;
+//        State_Detached_Params->detached_params_2.step_length = normal_step_right;
+//        State_Detached_Params->detached_params_3.step_length = normal_step_right;
+//        //腿号0123分别对应左前、左后、右前、右后，即1、2对应左腿，3、4对应右腿。注意配置对，否则正反馈。
+//        //狗腿长度控制（还有一种思路是只增不减，即保证最基本的情况，这样可以避免变数太多而增加调节负担）
+//        normal_stance_0 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.stance_height + Pitch_PID_Loop.Out_put - Roll_PID_Loop.Out_put;//先+后－，是为了抑制前倾和右翻。
+//        normal_stance_1 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_1.stance_height - Pitch_PID_Loop.Out_put - Roll_PID_Loop.Out_put;
+//        normal_stance_2 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_2.stance_height + Pitch_PID_Loop.Out_put + Roll_PID_Loop.Out_put;
+//        normal_stance_3 = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_3.stance_height - Pitch_PID_Loop.Out_put + Roll_PID_Loop.Out_put;
+//        //狗腿长度上限控制
+//        normal_stance_0  = ( (normal_stance_0>=LegLenthMax) ? LegLenthMax : normal_stance_0 );
+//        normal_stance_1  = ( (normal_stance_1>=LegLenthMax) ? LegLenthMax : normal_stance_1 );
+//        normal_stance_2  = ( (normal_stance_2>=LegLenthMax) ? LegLenthMax : normal_stance_2 );
+//        normal_stance_3  = ( (normal_stance_3>=LegLenthMax) ? LegLenthMax : normal_stance_3 );
+//        //狗腿长度下限控制
+//        normal_stance_0  = ( (normal_stance_0<=LegLenthMin) ? LegLenthMin : normal_stance_0 );
+//        normal_stance_1  = ( (normal_stance_1<=LegLenthMin) ? LegLenthMin : normal_stance_1 );
+//        normal_stance_2  = ( (normal_stance_2<=LegLenthMin) ? LegLenthMin : normal_stance_2 );
+//        normal_stance_3  = ( (normal_stance_3<=LegLenthMin) ? LegLenthMin : normal_stance_3 );
+//        //Pitch和Roll输出给stance_height参数
+//        State_Detached_Params->detached_params_0.stance_height = normal_stance_0;
+//        State_Detached_Params->detached_params_1.stance_height = normal_stance_1;
+//        State_Detached_Params->detached_params_2.stance_height = normal_stance_2;
+//        State_Detached_Params->detached_params_3.stance_height = normal_stance_3;
+//    }
+//}
 
 //新版IMU控制基于一个复制的基准进行IMU调节，避免了各种非归零造成的BUG。
 void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction)
 {
-    float normal_step_left,normal_step_right;
+    float normal_step_left = 0,normal_step_right = 0;
+    float f_left = 0,f_right = 0;
     if(IMU_Control_Flag)
     {
         /*******IMUのPID相关*******/
@@ -465,18 +367,44 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长减小
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * LengthChange_Kp;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * freChange_Kp;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 1.64f;//左腿频率增大
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 1.64f;//右腿频率减小
+
         //步长限幅
-        normal_step_left  = ((normal_step_left>StepLenthMax_Half)  ? StepLenthMax_Half : normal_step_left);
-        normal_step_right = ((normal_step_right>StepLenthMax_Half) ? StepLenthMax_Half : normal_step_right);
-        normal_step_left  = ((normal_step_left<StepLenthMin)  ? StepLenthMin : normal_step_left);
-        normal_step_right = ((normal_step_right<StepLenthMin) ? StepLenthMin : normal_step_right);
+        if(normal_step_right > StepLenthMax)
+            normal_step_right = StepLenthMax;
+        else if(normal_step_right < StepLenthMin)
+            normal_step_right = StepLenthMin;
+
+        if(normal_step_left > StepLenthMax)
+            normal_step_left = StepLenthMax;
+        else if(normal_step_left < StepLenthMin)
+            normal_step_left = StepLenthMin;
+
+        if(f_left > freMAX)
+            f_left = freMAX;
+        else if(f_left < freMIN)
+            f_left = freMIN;
+
+        if(f_right > freMAX)
+            f_right = freMAX;
+        else if(f_right < freMIN)
+            f_right = freMIN;
+
         //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
+
+        State_Detached_Params->detached_params_0.freq = f_left;
+        State_Detached_Params->detached_params_1.freq = f_left;
+
         State_Detached_Params->detached_params_2.step_length = normal_step_right;
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
+
+        State_Detached_Params->detached_params_2.freq = f_right;
+        State_Detached_Params->detached_params_3.freq = f_right;
     }
 }
 

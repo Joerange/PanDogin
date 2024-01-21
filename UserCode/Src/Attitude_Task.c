@@ -25,29 +25,23 @@ void LieDown_Posture(void)
         AngleWant_MotorX[i] = 0;
     }
 }
-//测试用Trot步态
-void Test_Move(void)
-{
-    ChangeGainOfPID(60,0,0.6f,0);
-    gait_detached(state_detached_params[9],Leg1_Delay,Leg2_Delay,Leg3_Delay,Leg4_Delay,Forward,Forward,Forward,Forward);
-}
 //实际运行Trot步态
 void Trot(float direction,int8_t kind)
 {
     AllLegsSpeedLimit(SpeedMode_FAST);
     switch(kind)
     {
-        case 0://大步Trot
+        case 0://小步Trot
             NewHeartbeat = 6;
             ChangeGainOfPID(8.0f,0,0.6f,0);
-            gait_detached(state_detached_params[0],0.0f, 0.5f, 0.5f, 0.0f,
+            gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
-        case 1://小步Trot
+        case 1://大步Trot
             NewHeartbeat = 5;
             ChangeGainOfPID(3.8f,0,0.6f,0);
-            YawControl(yawwant, &state_detached_params[11], direction);
-            gait_detached(state_detached_params[11],0.0f, 0.5f, 0.5f, 0.0f,
+            YawControl(yawwant, &state_detached_params[1], direction);
+            gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
         default:
@@ -58,9 +52,6 @@ void Trot(float direction,int8_t kind)
 //慢步
 void Walk(float direction,uint8_t speed)
 {
-//    PID_Set_KP_KI_KD(&Yaw_PID_Loop,1.7,0,1.0);
-//    YawControl(yawwant,&state_detached_params[1],direction);
-//    Yaw_PID_Loop.SumError_limit = 2500;Yaw_PID_Loop.Output_limit = 45;
     NewHeartbeat = 4;
     ChangeGainOfPID(3.5f,0,0.6f,0);
     gait_detached(state_detached_params[1],0.0,0.75,0.5,0.25,direction,direction,direction,direction);
@@ -73,21 +64,21 @@ void Turn(int state_flag)
     ChangeGainOfPID(4.0f,0,0.6f,0);
     switch (state_flag) {
         case 'l':
-            state_detached_params[8].detached_params_0.step_length = -10.0f;
-            state_detached_params[8].detached_params_1.step_length = -10.0f;
-            state_detached_params[8].detached_params_2.step_length = 10.0f;
-            state_detached_params[8].detached_params_3.step_length = 10.0f;
+            state_detached_params[0].detached_params_0.step_length = -6.0f;
+            state_detached_params[0].detached_params_1.step_length = -6.0f;
+            state_detached_params[0].detached_params_2.step_length = 6.0f;
+            state_detached_params[0].detached_params_3.step_length = 6.0f;
             break;
         case 'r':
-            state_detached_params[8].detached_params_0.step_length = 20.0f;
-            state_detached_params[8].detached_params_1.step_length = 20.0f;
-            state_detached_params[8].detached_params_2.step_length = -20.0f;
-            state_detached_params[8].detached_params_3.step_length = -20.0f;
+            state_detached_params[0].detached_params_0.step_length = 6.0f;
+            state_detached_params[0].detached_params_1.step_length = 6.0f;
+            state_detached_params[0].detached_params_2.step_length = -6.0f;
+            state_detached_params[0].detached_params_3.step_length = -6.0f;
             break;
         default:
             break;
     }
-    gait_detached(state_detached_params[8],  0.0f, 0.5f, 0.5f, 0.0f,
+    gait_detached(state_detached_params[0],  0.0f, 0.5f, 0.5f, 0.0f,
                   1.0f, 1.0f, 1.0f,1.0f);
 }
 
