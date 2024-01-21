@@ -71,10 +71,10 @@ void Remote_Controller(void)
             Turn('l');
             break;
         case 10:
-            Trot(Backward,1);
+            Walk(Backward,1);
             break;
         case 11:
-            Trot(Forward,1);
+            Walk(Forward,1);
         default:
             break;
     }

@@ -53,8 +53,9 @@ void Trot(float direction,int8_t kind)
 void Walk(float direction,uint8_t speed)
 {
     NewHeartbeat = 4;
+    AllLegsSpeedLimit(SpeedMode_VERYFAST);
     ChangeGainOfPID(3.5f,0,0.6f,0);
-    gait_detached(state_detached_params[1],0.0,0.75,0.5,0.25,direction,direction,direction,direction);
+    gait_detached(state_detached_params[3],0.0,0.75,0.5,0.25,direction,direction,direction,direction);
 }
 //ת�䲽̬
 void Turn(int state_flag)
