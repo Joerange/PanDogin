@@ -95,6 +95,7 @@ extern enum DPStates dpstate;
 extern float TargetAngle1,TargetAngle2;
 extern int Global_IMU_Control;
 
+void MarkingTime(void);
 void StandUp_Posture(void);
 void Test_Move(void);
 void Turn(int state_flag);

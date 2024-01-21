@@ -48,5 +48,6 @@ void ChangeGainOfPID(float pos_kp,float pos_kd,float sp_kp,float sp_ki);
 void Eight_PID_Init(void );
 void Change_speed_kp(float K_W);
 void SetPoint_IMU(PIDTypeDef *pid,float want);
+void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float error,float output_limit);
 
 #endif //DOG12_PID_H

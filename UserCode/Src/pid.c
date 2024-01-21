@@ -114,6 +114,19 @@ void ChangeGainOfPID(float pos_kp,float pos_kd,float sp_kp,float sp_ki)
 }
 
 /*!
+ * 修改陀螺仪PID参数
+ * @param pos_kp
+ * @param pos_kd
+ */
+void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float error,float output_limit)
+{
+    Yaw_PID_Loop.P = Yaw_Kp;
+    Yaw_PID_Loop.D = Yaw_Kd;
+    Yaw_PID_Loop.SumError_limit = error;
+    Yaw_PID_Loop.Output_limit = output_limit;
+}
+
+/*!
  * 初始化伪8自由度8个电机的PID参数
  */
 void Eight_PID_Init(void )
