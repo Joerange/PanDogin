@@ -368,9 +368,9 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         /**********步态控制*********/
         //Yaw输出给步长参数
         normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * LengthChange_Kp;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * freChange_Kp;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 1.64f;//左腿频率增大
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 1.64f;//右腿频率减小
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * LengthChange_Kp;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * freChange_Kp;//左腿频率增大
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * freChange_Kp;//右腿频率减小
 
         //步长限幅
         if(normal_step_right > StepLenthMax)
