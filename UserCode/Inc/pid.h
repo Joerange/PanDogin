@@ -30,6 +30,7 @@ typedef struct
     float LLast_error;
 
     float Out_put;
+    float Last_Out_put;
     float Output_limit;
 }PIDTypeDef;
 

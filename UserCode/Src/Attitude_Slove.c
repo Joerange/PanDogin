@@ -150,6 +150,9 @@ void CartesianToTheta(void)
 
     TargetAngle1 = TargetAngle1 / 180 * 3.1415926535;
     TargetAngle2 = TargetAngle2 / 180 * 3.1415926535;
+
+    if(Mark_flag == 1)
+        TargetAngle1 = -TargetAngle1;
 }
 /*
 * NAME: SinTrajectory (float t,GaitParams params, float gaitOffset)
@@ -267,10 +270,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 0,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 3.3f}
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f}
         },
         {
                 1,//大步Trot（快速）

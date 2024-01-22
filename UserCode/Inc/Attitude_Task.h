@@ -98,11 +98,11 @@ extern int Global_IMU_Control;
 void MarkingTime(void);
 void StandUp_Posture(void);
 void Test_Move(void);
-void Turn(int state_flag);
 void Trot(float direction,int8_t kind);
 void Walk(float direction,uint8_t speed);
 void LieDown_Posture(void);
 void Dog_Posture(void);
 void EndPosture(void);
+void Turn(int state_flag,int speed_flag);
 
 #endif //MY_SCUDOG_ATTITUDE_TASK_H

@@ -40,6 +40,7 @@ extern "C" {
 #include "motor.h"
 #include "imu.h"
 #include "pid.h"
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

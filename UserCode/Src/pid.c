@@ -54,7 +54,13 @@ void PID_PosLocCalc(PIDTypeDef *pid, int32_t feedbackpos)//位置式
     float Now_Point,Now_Error,d_Error;
     Now_Point = ((float )feedbackpos*2*pi)/(6.33f*32768);
     Now_Error=pid->Setpoint-Now_Point;
+
+    if(isnan(Now_Error) == 1) Now_Error = pid->Last_error;
+
     pid->SumError+=Now_Error;//这部分进行了累加，从而导致积分饱和现象。
+
+    if(isnan(pid->SumError) == 1) pid->SumError -= Now_Error;
+
     //积分限幅（而增量式PID不需要积分限幅）积分限幅有两种思路，一种是限制sum（相对限制），另一种是限制I*sum（绝对限制），后者我认为更加合理，但考虑到新老代码的兼容性，仍然采用前者。
     if(pid->SumError     >  pid->SumError_limit) pid->SumError= pid->SumError_limit;
     else if(pid->SumError< -pid->SumError_limit) pid->SumError=-pid->SumError_limit;
@@ -66,9 +72,13 @@ void PID_PosLocCalc(PIDTypeDef *pid, int32_t feedbackpos)//位置式
                    pid->I * pid->SumError +
                    pid->D * d_Error;
 
+    if(isnan(pid->Out_put) == 1) pid->Out_put = pid->Last_Out_put;
+
     //限幅输出
     if(pid->Out_put     > pid->Output_limit) pid->Out_put= pid->Output_limit;
     else if(pid->Out_put<-pid->Output_limit) pid->Out_put=-pid->Output_limit;
+
+    pid->Last_Out_put = pid->Out_put;
 }
 
 //增量式PID计算（用于速度环，其输出作为电调的控制电流值）

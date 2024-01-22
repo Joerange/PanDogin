@@ -10,8 +10,11 @@ float NewHeartbeat = 0;//心跳值
 //全局姿态控制
 int Global_IMU_Control = 0;
 
+uint8_t Mark_flag = 0;
+
 void StandUp_Posture(void)
 {
+    Mark_flag = 0;
     AllLegsSpeedLimit(SpeedMode_FAST);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
@@ -19,6 +22,7 @@ void StandUp_Posture(void)
 
 void LieDown_Posture(void)
 {
+    Mark_flag = 0;
     AllLegsSpeedLimit(SpeedMode_VERYSLOW);
     for(int i = 1;i < 9;i ++)
     {
@@ -27,6 +31,7 @@ void LieDown_Posture(void)
 }
 void MarkingTime(void)
 {
+    Mark_flag = 1;
     AllLegsSpeedLimit(SpeedMode_FAST);
     ChangeGainOfPID(3.8f,0,0.6f,0);
     ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
@@ -37,10 +42,11 @@ void MarkingTime(void)
 //实际运行Trot步态
 void Trot(float direction,int8_t kind)
 {
-    AllLegsSpeedLimit(SpeedMode_FAST);
+    Mark_flag = 0;
     switch(kind)
     {
         case 0://小步Trot
+            AllLegsSpeedLimit(SpeedMode_SLOW);
             NewHeartbeat = 6;
             ChangeGainOfPID(3.5f,0,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
@@ -49,6 +55,7 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
+            AllLegsSpeedLimit(SpeedMode_FAST);
             NewHeartbeat = 5;
             ChangeGainOfPID(3.8f,0,0.6f,0);
             YawControl(yawwant, &state_detached_params[1], direction);
@@ -63,6 +70,7 @@ void Trot(float direction,int8_t kind)
 //慢步
 void Walk(float direction,uint8_t speed)
 {
+    Mark_flag = 0;
     NewHeartbeat = 4;
     AllLegsSpeedLimit(SpeedMode_FAST);
     ChangeGainOfPID(3.5f,0,0.6f,0);
@@ -71,23 +79,31 @@ void Walk(float direction,uint8_t speed)
     gait_detached(state_detached_params[3],0.0,0.75,0.5,0.25,direction,direction,direction,direction);
 }
 //转弯步态
-void Turn(int state_flag)
+void Turn(int state_flag,int speed_flag)
 {
+    float length;
+
+    if(speed_flag == 'f')
+        length = 25.0f;
+    else if(speed_flag == 's')
+        length = 5.0f;
+
+    Mark_flag = 0;
     NewHeartbeat = 5;
     AllLegsSpeedLimit(SpeedMode_VERYFAST);
     ChangeGainOfPID(4.0f,0,0.6f,0);
     switch (state_flag) {
         case 'l':
-            state_detached_params[0].detached_params_0.step_length = -6.0f;
-            state_detached_params[0].detached_params_1.step_length = -6.0f;
-            state_detached_params[0].detached_params_2.step_length = 6.0f;
-            state_detached_params[0].detached_params_3.step_length = 6.0f;
+            state_detached_params[0].detached_params_0.step_length = -length;
+            state_detached_params[0].detached_params_1.step_length = -length;
+            state_detached_params[0].detached_params_2.step_length = length;
+            state_detached_params[0].detached_params_3.step_length = length;
             break;
         case 'r':
-            state_detached_params[0].detached_params_0.step_length = 6.0f;
-            state_detached_params[0].detached_params_1.step_length = 6.0f;
-            state_detached_params[0].detached_params_2.step_length = -6.0f;
-            state_detached_params[0].detached_params_3.step_length = -6.0f;
+            state_detached_params[0].detached_params_0.step_length = length;
+            state_detached_params[0].detached_params_1.step_length = length;
+            state_detached_params[0].detached_params_2.step_length = -length;
+            state_detached_params[0].detached_params_3.step_length = -length;
             break;
         default:
             break;
@@ -134,10 +150,10 @@ void Dog_Posture(void)
             LieDown_Posture();
             break;
         case TURN_LEFT:
-            Turn('l');
+            Turn('l','s');
             break;
         case TURN_RIGHT:
-            Turn('r');
+            Turn('r','s');
             break;
         case MARCH:
             Walk(Forward,0);

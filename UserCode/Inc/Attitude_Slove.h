@@ -70,6 +70,7 @@ extern DetachedParam StateDetachedParams_Copy[];
 extern float AngleWant_MotorX[9];
 extern float x,y;
 extern float steplen;
+extern uint8_t Mark_flag;
 
 void Get_Target(int theta1,int theta2);
 void SetCoupledThetaPositionAll(void);
