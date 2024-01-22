@@ -41,6 +41,7 @@ extern "C" {
 #include "imu.h"
 #include "pid.h"
 #include <math.h>
+#include "Jump_Task.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

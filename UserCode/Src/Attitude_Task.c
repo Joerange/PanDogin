@@ -34,8 +34,8 @@ void MarkingTime(void)
     Mark_flag = 1;
     AllLegsSpeedLimit(SpeedMode_FAST);
     ChangeGainOfPID(3.8f,0,0.6f,0);
-    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
-    YawControl(yawwant, &state_detached_params[2], 1.0f);
+//    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
+//    YawControl(yawwant, &state_detached_params[2], 1.0f);
     gait_detached(state_detached_params[2],0.0f, 0.5f, 0.5f, 0.0f,
                   1.0f,1.0f,1.0f,1.0f);
 }

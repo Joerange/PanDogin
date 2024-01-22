@@ -163,10 +163,7 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
-      //usart_printf("%f,%f\n",x,y);
-//      usart_printf("%f,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],state_detached_params[11].detached_params_0.freq,state_detached_params[11].detached_params_2.freq);
-
-    osDelay(20);
+    osDelay(5);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
