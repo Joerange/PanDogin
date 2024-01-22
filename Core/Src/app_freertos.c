@@ -128,11 +128,11 @@ void StartDebug(void const * argument)
 {
   /* USER CODE BEGIN StartDebug */
     Myinit();
-    RemoteControl_Init(1,0);
+    RemoteControl_Init(1,0); //选择要使用的远程控制模式
     printf("Init_Ready\n");
     osDelay(3);
 
-    osDelay(3000);
+    osDelay(3000); //在调试的时候延迟3秒用来打开急停开关
 
     vTaskResume(GO1Init_TaskHandle);
 
@@ -193,7 +193,7 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
-    vTaskSuspend(NULL);
+    vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)
   {
@@ -216,7 +216,7 @@ void GO1_outTask(void const * argument)
   for(;;)
   {
       leg_pos_controll();
-      leg_pos_controll02();
+      leg_pos_controll02(); //作为将信号输出到GO1电机的函数
 
     osDelay(5);
   }

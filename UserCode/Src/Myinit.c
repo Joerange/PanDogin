@@ -12,7 +12,6 @@ void Myinit(void)
     MyFDCan2_config();
     MyFDCan3_config();
     RetargetInit(&huart3);
-//    RetargetInit(&huart2);
     HAL_TIM_Base_Start_IT(&htim2);
 
     memcpy(StateDetachedParams_Copy,state_detached_params,100*StatesMaxNum);//state_detached_params每个元素（DetachedParam型,即每种步态，外加一个u8的ID号）。
