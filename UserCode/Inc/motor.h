@@ -9,7 +9,7 @@
 
 #define MOTOR_SEND_LENGTH      17         //发送给电机的控制命令是17个字节
 #define MOTOR_ID_NUM           12
-#define pi                     3.1415926f
+#define pi                     3.1415926535f
 #define position               1
 #define Zero_torque            2
 #define MOTOR_RECEIVE_SIZE 16
