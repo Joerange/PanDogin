@@ -27,7 +27,7 @@
 //腿长限位
 #define LegLenthExtremeMax 45.0f //
 #define LegLenthMax 40.0f //
-#define LegLenthMin 20.0f //
+#define LegLenthMin 15.0f //
 #define LegStandLenth 18.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位

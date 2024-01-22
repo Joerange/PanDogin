@@ -150,9 +150,6 @@ void CartesianToTheta(void)
 
     TargetAngle1 = TargetAngle1 / 180 * 3.1415926535;
     TargetAngle2 = TargetAngle2 / 180 * 3.1415926535;
-
-    if(Mark_flag == 1)
-        TargetAngle1 = -TargetAngle1;
 }
 /*
 * NAME: SinTrajectory (float t,GaitParams params, float gaitOffset)
@@ -270,39 +267,39 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 0,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {15.0f, 6.25f, 7.0f, 7.0f, 0.3f, 4.0f},
-                {15.0f, 6.25f, 7.0f, 7.0f, 0.3f, 4.0f},
-                {15.0f, 6.25f, 7.0f, 7.0f, 0.3f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0f, 6.25f, 7.0f, 7.0f, 0.3f, 4.0f}
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f}
         },
         {
                 1,//大步Trot（快速）
-                {10.0f, 100.0f,  9.3f, 5.0f, 0.34f, 4.0f},
-                {10.0f, 100.0f,  9.3f, 5.0f, 0.34f, 4.0f},
-                {10.0f, 100.0f,  9.3f, 5.0f, 0.34f, 4.0f},
-                {10.0f, 100.0f,  9.3f, 5.0f, 0.34f, 4.0f}
+                {10.0f, 85.0f,  9.3f, 5.0f, 0.34f, 4.0f},
+                {10.0f, 85.0f,  9.3f, 5.0f, 0.34f, 4.0f},
+                {10.0f, 85.0f,  9.3f, 5.0f, 0.34f, 4.0f},
+                {10.0f, 85.0f,  9.3f, 5.0f, 0.34f, 4.0f}
 
         },
         {
             2,//原地踏步
-            {15.0f, 0.0f,  20.0f, 20.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  20.0f, 20.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  20.0f, 20.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  20.0f, 20.0f, 0.25f, 3.0f}
+            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f}
         },
         {
             3,//Walk步态（没有调好）
-            {15.0f, 19.0f,  12.0f, 0.3f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 0.3f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 0.3f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 0.3f, 0.25f, 2.0f}
+            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
+            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
+            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
+            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f}
         },
         {
             4,//小步Trot（稳速）
-            {12.0f, 20.0f,  11.0f, 5.0f, 0.29f, 1.5f},
-            {12.0f, 20.0f,  11.0f, 5.0f, 0.29f, 1.5f},
-            {12.0f, 20.0f,  11.0f, 5.0f, 0.29f, 1.5f},
-            {12.0f, 20.0f,  11.0f, 5.0f, 0.29f, 1.5f}
+            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
+            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
+            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
+            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f}
 
         },
 };
@@ -379,7 +376,7 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
     SetCoupledCartesianPosition(2,x_want,y_want);
     SetCoupledCartesianPosition(1,x_want,y_want);
     SetCoupledCartesianPosition(3,x_want,y_want);
-    osDelay(delaytime);//此处未知HAL_Delay是否出错
+    osDelay(delaytime);
 }
 
 //所有腿的极坐标控制

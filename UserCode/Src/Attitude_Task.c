@@ -55,7 +55,7 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://´ó²½Trot
-            AllLegsSpeedLimit(SpeedMode_FAST);
+            AllLegsSpeedLimit(5.5f);
             NewHeartbeat = 5;
             ChangeGainOfPID(3.8f,0,0.6f,0);
             ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);
@@ -86,7 +86,7 @@ void Turn(int state_flag,int speed_flag)
 
     if(speed_flag == 'f')
     {
-        length = 25.0f;
+        length = 20.0f;
         state_detached_params[0].detached_params_0.freq = 4.0f;
         state_detached_params[0].detached_params_1.freq = 4.0f;
         state_detached_params[0].detached_params_2.freq = 4.0f;

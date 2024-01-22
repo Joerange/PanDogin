@@ -4,11 +4,14 @@
 #include "main.h"
 #include "Jump_Task.h"
 
-void ExecuteJump(uint8_t JumpType,float JumpAngle) {
+void ExecuteJump(uint8_t JumpType,float JumpAngle)
+{
+    Mark_flag = 0;
+
     if (JumpType == Standard_Jump)//标准跳（对绝大多数地面都有较好的适应性，兼具高度和远度）
     {
         /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
-        const uint16_t prep_time = 300;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
+        const uint16_t prep_time = 400;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
         const uint16_t launch_time = 200;    //伸展腿的持续时间                  [s]  0.2
         const uint16_t fall_time = 250;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
         const uint16_t strech_time = 300;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
@@ -38,7 +41,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle) {
         高刚度表现为，转动很小的角度都很费力，即很难转动电机。
         */
         //飞翔过程（也即降落过程）中的姿态（核心），持续时间为fall_time
-        AllLegsSpeedLimit(SpeedMode_EXTREME);
+        AllLegsSpeedLimit(SpeedMode_VERYFAST);
         ChangeGainOfPID(8.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(-25, jump_flylegheight, fall_time);
         /*
@@ -51,7 +54,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle) {
         //脚用力准备站起来
         ChangeGainOfPID(8.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(-70, jump_landlegheight, strech_time);
-        //差不多站好了，执行完毕
+//        //差不多站好了，执行完毕
         StandUp_Posture();
     }
 }

@@ -65,16 +65,16 @@ void Remote_Controller(void)
             LieDown_Posture();
             break;
         case 6:
-            Turn('r','s');
+            Turn('l','f');
             break;
         case 7:
-            Turn('l','s');
+            Turn('r','f');
             break;
         case 10:
-            Trot(Backward,1);
+            Trot(Backward,0);
             break;
         case 11:
-            Trot(Forward,1);
+            Trot(Forward,0);
             break;
         case 20:
             ExecuteJump(Standard_Jump,60);
