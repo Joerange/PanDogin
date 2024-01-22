@@ -14,7 +14,7 @@ IMU_EulerAngle_u IMU_EulerAngle={0};
 //IMU串口接收BUF
 uint8_t IMU_RX_BUF[IMU_REC_LEN]={0};
 //是否开启IMU控制
-uint8_t IMU_Control_Flag = 1;
+uint8_t IMU_Control_Flag = 0;
 //IMU的PID的Kp值
 float IMU_Kp_Intensity = 4.0f;
 //期望角度
