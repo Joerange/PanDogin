@@ -28,7 +28,7 @@
 #define LegLenthExtremeMax 45.0f //
 #define LegLenthMax 40.0f //
 #define LegLenthMin 15.0f //
-#define LegStandLenth 18.0f //
+#define LegStandLenth 25.0f //
 #define LegSquatLenth 11.2f //
 //Õ»≥§œﬁŒª
 #define StepLenthMin 60.0f

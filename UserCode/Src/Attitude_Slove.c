@@ -282,24 +282,24 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
             2,//原地踏步
-            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f},
-            {15.0f, 0.0f,  5.0f, 6.0f, 0.25f, 3.0f}
+            {15.0f, 0.0f,  5.0f, 5.0f, 0.1f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 5.0f, 0.1f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 5.0f, 0.1f, 3.0f},
+            {15.0f, 0.0f,  5.0f, 5.0f, 0.1f, 3.0f}
         },
         {
             3,//Walk步态（没有调好）
-            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f},
-            {15.0f, 19.0f,  12.0f, 6.0f, 0.25f, 2.0f}
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f}
         },
         {
             4,//小步Trot（稳速）
-            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
-            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
-            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f},
-            {16.0f, 20.0f,  11.0f, 11.0f, 0.25f, 1.5f}
+            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
+            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
+            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
+            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f}
 
         },
 };
@@ -373,8 +373,8 @@ void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
 void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 {
     SetCoupledCartesianPosition(0,x_want,y_want);
-    SetCoupledCartesianPosition(2,x_want,y_want);
     SetCoupledCartesianPosition(1,x_want,y_want);
+    SetCoupledCartesianPosition(2,x_want,y_want);
     SetCoupledCartesianPosition(3,x_want,y_want);
     osDelay(delaytime);
 }

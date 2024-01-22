@@ -71,12 +71,13 @@ void Remote_Controller(void)
             Turn('r','f');
             break;
         case 10:
-            Trot(Backward,0);
+            Trot(Forward,1);
             break;
         case 11:
-            Trot(Forward,0);
+            Trot(Backward,1);
             break;
         case 20:
+            jump_flag = 1;
             ExecuteJump(Standard_Jump,60);
         case 33:
             MarkingTime();
