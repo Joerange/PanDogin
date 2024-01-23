@@ -4,7 +4,6 @@
 #include "main.h"
 #include "Jump_Task.h"
 
-uint8_t jump_flag = 0;
 
 void ExecuteJump(uint8_t JumpType,float JumpAngle)
 {
@@ -54,8 +53,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         //脚用力准备站起来
         ChangeGainOfPID(8.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(-70, jump_landlegheight, strech_time);
-        //差不多站好了，执行完毕
-        StandUp_Posture();
+        //差不多站好了，执行
         gpstate = 1;
     }
 }

@@ -18,7 +18,5 @@ enum JumpTypes
     Test_Jump =     5,
 };
 
-extern uint8_t jump_flag;
-
 void ExecuteJump(uint8_t JumpType,float JumpAngle);
 #endif //ROBOMASTER_C_DEMO_JUMP_TASK_H

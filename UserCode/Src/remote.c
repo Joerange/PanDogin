@@ -79,7 +79,6 @@ void Remote_Controller(void)
             Trot(Backward,1);
             break;
         case 20:
-            jump_flag = 1;
             ExecuteJump(Standard_Jump,60);
         case 33:
             MarkingTime();
