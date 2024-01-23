@@ -51,6 +51,8 @@ osThreadId StartTaskHandle;
 osThreadId BlueteethTaskHandle;
 osThreadId GO1Init_TaskHandle;
 osThreadId GO1_OutputHandle;
+osThreadId VisualHandle;
+osMessageQId VisialHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -61,6 +63,7 @@ void StartDebug(void const * argument);
 void BlueTeeth_RemoteControl(void const * argument);
 void GO1Init(void const * argument);
 void GO1_outTask(void const * argument);
+void VisualTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -86,6 +89,11 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* definition and creation of Visial */
+  osMessageQDef(Visial, 1, uint8_t);
+  VisialHandle = osMessageCreate(osMessageQ(Visial), NULL);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -107,12 +115,17 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(GO1_Output, GO1_outTask, osPriorityAboveNormal, 0, 512);
   GO1_OutputHandle = osThreadCreate(osThread(GO1_Output), NULL);
 
+  /* definition and creation of Visual */
+  osThreadDef(Visual, VisualTask, osPriorityHigh, 0, 256);
+  VisualHandle = osThreadCreate(osThread(Visual), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
     vTaskResume(StartTaskHandle);
     vTaskSuspend(GO1Init_TaskHandle);
     vTaskSuspend(BlueteethTaskHandle);
     vTaskSuspend(GO1_OutputHandle);
+    vTaskSuspend(VisualHandle);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -163,7 +176,7 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
-    osDelay(5);
+    osDelay(10);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
@@ -193,6 +206,7 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
+    vTaskResume(VisualHandle);
     vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)
@@ -221,6 +235,37 @@ void GO1_outTask(void const * argument)
     osDelay(5);
   }
   /* USER CODE END GO1_outTask */
+}
+
+/* USER CODE BEGIN Header_VisualTask */
+/**
+* @brief Function implementing the Visual thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_VisualTask */
+void VisualTask(void const * argument)
+{
+  /* USER CODE BEGIN VisualTask */
+  static Visial_data vis_data;
+  /* Infinite loop */
+  for(;;)
+  {
+      if(xQueueReceive(VisialHandle,&vis_data,0) == pdTRUE)
+      {
+            if(vis_data.distance > 0)
+            {
+
+            }
+            else if(vis_data.distance < 0)
+            {
+
+            }
+      }
+
+    osDelay(1);
+  }
+  /* USER CODE END VisualTask */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -42,6 +42,8 @@ uint16_t MoveIntensity_PosKp = 70;
 float MoveIntensity_SpdKi = 0.26;
 //跳跃角度控制
 uint8_t Jump_Angle_Remote = 60;
+//遥控器心跳控制
+int16_t RemoteHeartBeat = 0;
 
 //关闭遥控串口接收中断
 void CloseRemote(void)

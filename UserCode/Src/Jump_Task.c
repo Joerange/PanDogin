@@ -23,7 +23,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
         ChangeGainOfPID(6.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
-        SetPolarPositionAll_Delay(JumpAngle + 15, stance_height, prep_time);
+        SetPolarPositionAll_Delay(JumpAngle, stance_height, prep_time);
         //芜湖起飞（核心），持续时间为launch_time
         AllLegsSpeedLimit(SpeedMode_EXTREME);//速度拉满
         ChangeGainOfPID(20.0f, 0, 0, 0);//使用刚度小，阻尼大的增益

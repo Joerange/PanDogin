@@ -30,6 +30,7 @@ extern uint32_t MoveSpeed;
 extern uint16_t MoveIntensity_PosKp;
 extern float MoveIntensity_SpdKi;
 extern uint8_t Jump_Angle_Remote;
+extern int16_t RemoteHeartBeat;
 
 void DebugUSART_Init(int bound);//串口1调试无线下载器远程控制用
 void RemoteUSART_Init(int bound);//蓝牙无线远程控制用

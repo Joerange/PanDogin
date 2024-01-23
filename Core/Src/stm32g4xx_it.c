@@ -465,9 +465,9 @@ void UART5_IRQHandler(void)
 
         visual_process();
 
-//        memset(VISUAL_REC,0x00,sizeof VISUAL_REC);
+        HAL_UART_Receive_DMA(&huart5,(uint8_t *)&VISUAL_REC,Length_of_visual);//使能串口5 DMA接受
     }
-    HAL_UART_Receive_DMA(&huart5,(uint8_t *)&VISUAL_REC,Length_of_visual);//使能串口5 DMA接受
+
   /* USER CODE END UART5_IRQn 0 */
   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */
