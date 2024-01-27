@@ -29,11 +29,11 @@ void LieDown_Posture(void)
 void MarkingTime(void)
 {
     Mark_flag = 1;
-    AllLegsSpeedLimit(SpeedMode_VERYFAST);
+    AllLegsSpeedLimit(SpeedMode_FAST);
     ChangeGainOfPID(3.8f,0,0.6f,0);
 //    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
 //    YawControl(yawwant, &state_detached_params[2], 1.0f);
-    gait_detached(state_detached_params[2],0.0,0.75,0.5,0.25,
+    gait_detached(state_detached_params[2],0.0f, 0.5f, 0.5f, 0.0f,
                   1.0f,1.0f,1.0f,1.0f);
 }
 //实际运行Trot步态
@@ -42,20 +42,20 @@ void Trot(float direction,int8_t kind)
     switch(kind)
     {
         case 0://小步Trot
-            AllLegsSpeedLimit(4.0f);
+            AllLegsSpeedLimit(SpeedMode_VERYFAST);
             NewHeartbeat = 6;
-            ChangeGainOfPID(3.5f,0,0.6f,0);
+            ChangeGainOfPID(10.0f,0,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[4], direction);
             gait_detached(state_detached_params[4],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
-            AllLegsSpeedLimit(6.0f);
-            NewHeartbeat = 5;
-            Change_SinStateDetachedParams(&state_detached_params[1],1,1,15.0f,64,14.9f,13.5f,0.32f,4.0f);
-            ChangeGainOfPID(4.0f,0,0.6f,0);
-            ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);
+            AllLegsSpeedLimit(SpeedMode_EXTREME);
+            NewHeartbeat = 4;
+//            Change_SinStateDetachedParams(&state_detached_params[1],1,1,15.0f,64,14.9f,13.5f,0.32f,4.0f);
+            ChangeGainOfPID(17.0f,1.0f,0.6f,0);
+            ChangeYawOfPID(5000.0f,10.0f,4000.0f,15.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
@@ -82,7 +82,7 @@ void Turn(int state_flag,int speed_flag)
 
     if(speed_flag == 'f')
     {
-        length = 20.0f;
+        length = 15.0f;
         state_detached_params[0].detached_params_0.freq = 4.0f;
         state_detached_params[0].detached_params_1.freq = 4.0f;
         state_detached_params[0].detached_params_2.freq = 4.0f;
@@ -98,8 +98,8 @@ void Turn(int state_flag,int speed_flag)
     }
 
     NewHeartbeat = 5;
-    AllLegsSpeedLimit(SpeedMode_VERYFAST);
-    ChangeGainOfPID(4.0f,0,0.6f,0);
+    AllLegsSpeedLimit(SpeedMode_EXTREME);
+    ChangeGainOfPID(10.0f,0,0.6f,0);
     switch (state_flag) {
         case 'l':
             state_detached_params[0].detached_params_0.step_length = -length;

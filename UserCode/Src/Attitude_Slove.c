@@ -267,25 +267,25 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 0,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {15.0f, 6.25f, 5.0f, 5.0f, 0.3f, 4.0f}
+                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
+                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
+                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f}
         },
         {
-                1,//大步Trot（快速）
-                {15.0f, 60.0f,  13.5f,13.5f, 0.32f, 4.0f},
-                {15.0f, 60.0f,  13.5f,13.5f, 0.32f, 4.0f},
-                {15.0f, 60.0f,  13.5f,13.5f, 0.32f, 4.0f},
-                {15.0f, 60.0f,  13.5f,13.5f, 0.32f, 4.0f}
+                1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
+                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
+                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
+                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f}
 
         },
         {
-            2,//原地踏步
-            {16.0f, 0.0f,  3.0f, 3.0f, 0.15f, 4.0f},
-            {16.0f, 0.0f,  3.0f, 3.0f, 0.15f, 4.0f},
-            {16.0f, 0.0f,  3.0f, 3.0f, 0.15f, 4.0f},
-            {16.0f, 0.0f,  3.0f, 3.0f, 0.15f, 4.0f}
+            2,//原地踏步//出现多种步态基高差距过大是会失效
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f}
         },
         {
             3,//Walk步态（没有调好）
@@ -319,10 +319,8 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * LengthChange_Kp;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * LengthChange_Kp;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * freChange_Kp;//左腿频率增大
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * freChange_Kp;//右腿频率减小
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长减小
 
         //步长限幅
         if(normal_step_right > StepLenthMax)
@@ -335,28 +333,12 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         else if(normal_step_left < StepLenthMin)
             normal_step_left = StepLenthMin;
 
-        if(f_left > freMAX)
-            f_left = freMAX;
-        else if(f_left < freMIN)
-            f_left = freMIN;
-
-        if(f_right > freMAX)
-            f_right = freMAX;
-        else if(f_right < freMIN)
-            f_right = freMIN;
-
         //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
-        State_Detached_Params->detached_params_0.freq = f_left;
-        State_Detached_Params->detached_params_1.freq = f_left;
-
         State_Detached_Params->detached_params_2.step_length = normal_step_right;
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
-
-        State_Detached_Params->detached_params_2.freq = f_right;
-        State_Detached_Params->detached_params_3.freq = f_right;
     }
 }
 
