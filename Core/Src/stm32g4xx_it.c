@@ -335,11 +335,11 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 0 */
     uint8_t id;                          //电机id
     uint8_t mode;                        //电机模式
+
     if(__HAL_UART_GET_FLAG(&huart1,UART_FLAG_IDLE)==SET)
     {
         __HAL_UART_CLEAR_IDLEFLAG(&huart1);//清除空闲中断接受标志wei
         HAL_UART_DMAStop(&huart1);//关闭DMA接受
-//        usart_printf("%d,%d,%d,%d,%d,%d\r\n",LeftLeg_ReceiverBuffer[0],LeftLeg_ReceiverBuffer[1],LeftLeg_ReceiverBuffer[2],LeftLeg_ReceiverBuffer[3],LeftLeg_ReceiverBuffer[4]);
         uart1_rec_crc = CRC16_CCITT(LeftLeg_ReceiverBuffer, 14);
         if(uart1_rec_crc == (LeftLeg_ReceiverBuffer[14] | (LeftLeg_ReceiverBuffer[15] << 8)))           //接收到正确的反馈报文
         {
@@ -354,12 +354,10 @@ void USART1_IRQHandler(void)
             }
             else if (mode == 1)
             {
-//                usart_printf("%d\r\n",end_pos[id]);
                 end_pos[id] = LeftLeg_ReceiverBuffer[7] | (LeftLeg_ReceiverBuffer[8] << 8) | (LeftLeg_ReceiverBuffer[9] << 16) | (LeftLeg_ReceiverBuffer[10] << 24);
                 real_speed[id] = (int16_t)(LeftLeg_ReceiverBuffer[5] | (LeftLeg_ReceiverBuffer[6] << 8));
                 temperature[id] = (int8_t)LeftLeg_ReceiverBuffer[11];
                 merror[id] = (LeftLeg_ReceiverBuffer[12] & 0x07);
-//                usart_printf("%d\r\n",real_speed[5]);
             }
 
         }
@@ -460,12 +458,10 @@ void UART5_IRQHandler(void)
   /* USER CODE BEGIN UART5_IRQn 0 */
     if(__HAL_UART_GET_FLAG(&huart5,UART_FLAG_IDLE)==SET)
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart1);//清除空闲中断接受标志wei
-        HAL_UART_DMAStop(&huart1);//关闭DMA接受
+        __HAL_UART_CLEAR_IDLEFLAG(&huart5);//清除空闲中断接受标志wei
+        HAL_UART_DMAStop(&huart5);//关闭DMA接受
 
-        visual_process();
-
-        HAL_UART_Receive_DMA(&huart5,(uint8_t *)&VISUAL_REC,Length_of_visual);//使能串口5 DMA接受
+        HAL_UART_Receive_DMA(&huart5,(uint8_t *)&visual.data_8,Length_of_visual);//使能串口5 DMA接受
     }
 
   /* USER CODE END UART5_IRQn 0 */

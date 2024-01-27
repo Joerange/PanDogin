@@ -17,7 +17,7 @@
 //#define offset_back_1  0.5346f//207.2f
 #define offset_front_0 0.2970f
 #define offset_front_1 0.8373f
-#define offset_back_0  0.3000f//(-121.9f)
+#define offset_back_0  0.2970f//(-121.9f)
 #define offset_back_1  0.8373f//207.2f
 
 #define PI 3.1415926535f
@@ -25,10 +25,10 @@
 #define L1 15.0f //????100mm
 #define L2 27.85f//?ó??200mm
 //腿长限位
-#define LegLenthExtremeMax 42.0f //
-#define LegLenthMax 40.0f //
+#define LegLenthExtremeMax 40.0f //
+#define LegLenthMax 38.0f //
 #define LegLenthMin 15.0f //
-#define LegStandLenth 25.0f //
+#define LegStandLenth 22.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位
 #define StepLenthMin 60.0f

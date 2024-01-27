@@ -124,7 +124,7 @@ void MX_UART5_Init(void)
   }
   /* USER CODE BEGIN UART5_Init 2 */
     __HAL_UART_ENABLE_IT(&huart5,UART_IT_IDLE);//启用串口5 空闲接受中断
-    HAL_UART_Receive_DMA(&huart5,(uint8_t *)&VISUAL_REC,Length_of_visual);//使能串口5 DMA接受
+    HAL_UART_Receive_DMA(&huart5,(uint8_t *)&visual.data_8,Length_of_visual);//使能串口5 DMA接受
   /* USER CODE END UART5_Init 2 */
 
 }

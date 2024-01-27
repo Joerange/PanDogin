@@ -175,6 +175,7 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
+//      usart_printf("%f,%f,%f,%f,%f,%f,%f,%f\n",AngleLoop[1].Out_put,AngleLoop[2].Out_put,AngleLoop[3].Out_put,AngleLoop[4].Out_put,AngleLoop[5].Out_put,AngleLoop[6].Out_put,AngleLoop[7].Out_put,AngleLoop[8].Out_put);
 
     osDelay(10);
   }
@@ -206,7 +207,7 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
-    vTaskResume(VisualHandle);
+//    vTaskResume(VisualHandle);
     vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)
@@ -247,21 +248,11 @@ void GO1_outTask(void const * argument)
 void VisualTask(void const * argument)
 {
   /* USER CODE BEGIN VisualTask */
-  static Visial_data vis_data;
   /* Infinite loop */
   for(;;)
   {
-      if(xQueueReceive(VisialHandle,&vis_data,0) == pdTRUE)
-      {
-            if(vis_data.distance > 0)
-            {
-
-            }
-            else if(vis_data.distance < 0)
-            {
-
-            }
-      }
+      if(visual.distance < 2.0f)
+          Turn('l','f');
 
     osDelay(1);
   }
