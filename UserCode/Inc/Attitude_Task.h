@@ -94,6 +94,7 @@ extern enum GPStates gpstate;
 extern enum DPStates dpstate;
 extern float TargetAngle1,TargetAngle2;
 extern int Global_IMU_Control;
+extern float Direct;
 
 void MarkingTime(void);
 void StandUp_Posture(void);
@@ -104,5 +105,9 @@ void LieDown_Posture(void);
 void Dog_Posture(void);
 void EndPosture(void);
 void Turn(int state_flag,int speed_flag);
+void Handshake(void);
+void StretchPosture(void);
+void SquatPosture(void);
+void FBwAaLitAir(void);
 
 #endif //MY_SCUDOG_ATTITUDE_TASK_H

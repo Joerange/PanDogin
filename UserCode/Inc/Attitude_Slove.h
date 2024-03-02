@@ -17,8 +17,8 @@
 //#define offset_back_1  0.5346f//207.2f
 #define offset_front_0 0.2970f
 #define offset_front_1 0.8373f
-#define offset_back_0  0.2970f//(-121.9f)
-#define offset_back_1  0.8373f//207.2f
+#define offset_back_0  0.3000f//(-121.9f)
+#define offset_back_1  0.8420f//207.2f
 
 #define PI 3.1415926535f
 //大小腿长
@@ -31,8 +31,8 @@
 #define LegStandLenth 22.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位
-#define StepLenthMin 13.0f
-#define StepLenthMax 28.0f //大小大概在45cm
+#define StepLenthMin 18.5f
+#define StepLenthMax 26.5f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
 #define StatesMaxNum 20
@@ -40,8 +40,10 @@
 #define LengthChange_Kp 5.0f
 #define freChange_Kp 1.67f
 
-#define freMAX 4.0f
-#define freMIN 2.0f
+#define freMAX 7.0f
+#define freMIN 4.0f
+
+#define MidPoint 100
 
 typedef struct
 {
@@ -89,5 +91,6 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
 void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime);
 void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime);
 void SetCoupledCartesianPosition(int LegId,float x_want,float y_want);
-
+void ReverseMoveOpen(void);
+void ReverseMoveClose(void);
 #endif //MY_SCUDOG_ATTITUDE_SLOVE_H

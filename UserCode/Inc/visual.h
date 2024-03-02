@@ -9,17 +9,19 @@
 #include "queue.h"
 #include "cmsis_os.h"
 
-#define Length_of_visual 4
+#define Length_of_visual 7
 
-typedef union
+typedef struct
 {
-    uint8_t data_8[4];
+    uint8_t data_8[7];
     float distance;
+    float offset;
 }Visial_data;
 
 extern osMessageQId VisialHandle;
 extern uint8_t VISUAL_REC[Length_of_visual];
 extern Visial_data visual;
+extern uint8_t visual_control_flag;
 
 void visual_process(void);
 

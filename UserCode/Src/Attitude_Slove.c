@@ -271,13 +271,21 @@ DetachedParam state_detached_params[StatesMaxNum] = {
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f}
+//                0,//转弯（在转弯函数中会调整该步态以实现转弯）
+//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
+//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
+//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f}
         },
         {
-                1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
-                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
-                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f},
-                {20.0f, 23.0f,  2.0f, 1.5f, 0.35f, 5.0f}
+
+            1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
+            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
+            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
+            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f}
+
+
 
         },
         {
@@ -296,10 +304,21 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
             4,//小步Trot（稳速）
-            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
-            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
-            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f},
-            {16.0f, 30.0f,  9.0f, 5.0f, 0.25f, 1.8f}
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
+
+        },
+        {
+
+                5,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f}
+
+
 
         },
 };
@@ -321,7 +340,8 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         //Yaw输出给步长参数
         normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长增加
         normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长减小
-
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put;//左腿步长增加
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put;//左腿步长增加
         //步长限幅
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
@@ -333,12 +353,77 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         else if(normal_step_left < StepLenthMin)
             normal_step_left = StepLenthMin;
 
+        if(f_right > freMAX)
+            f_right = freMAX;
+        else if(f_right < freMIN)
+            f_right = freMIN;
+//
+        if(f_left > freMAX)
+            f_left = freMAX;
+        else if(f_left < freMIN)
+            f_left = freMIN;
+
         //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
+        State_Detached_Params->detached_params_0.freq = f_left;
+        State_Detached_Params->detached_params_1.freq = f_left;
+
         State_Detached_Params->detached_params_2.step_length = normal_step_right;
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
+
+        State_Detached_Params->detached_params_2.freq = f_right;
+        State_Detached_Params->detached_params_3.freq = f_right;
+    }
+    else if(visual_control_flag)
+    {
+        /*******IMUのPID相关*******/
+        //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度）
+        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
+        SetPoint_Visual(&VisualLoop,MidPoint);
+        PID_PosLocCalc(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
+        PID_PosLocCalc(&VisualLoop,visual.offset);
+        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
+        /**********步态控制*********/
+        //Yaw输出给步长参数
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//左腿步长增加
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//左腿步长增加
+        //步长限幅
+        if(normal_step_right > StepLenthMax)
+            normal_step_right = StepLenthMax;
+        else if(normal_step_right < StepLenthMin)
+            normal_step_right = StepLenthMin;
+
+        if(normal_step_left > StepLenthMax)
+            normal_step_left = StepLenthMax;
+        else if(normal_step_left < StepLenthMin)
+            normal_step_left = StepLenthMin;
+
+        if(f_right > freMAX)
+            f_right = freMAX;
+        else if(f_right < freMIN)
+            f_right = freMIN;
+//
+        if(f_left > freMAX)
+            f_left = freMAX;
+        else if(f_left < freMIN)
+            f_left = freMIN;
+
+        //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
+        State_Detached_Params->detached_params_0.step_length = normal_step_left;
+        State_Detached_Params->detached_params_1.step_length = normal_step_left;
+
+        State_Detached_Params->detached_params_0.freq = f_left;
+        State_Detached_Params->detached_params_1.freq = f_left;
+
+        State_Detached_Params->detached_params_2.step_length = normal_step_right;
+        State_Detached_Params->detached_params_3.step_length = normal_step_right;
+
+        State_Detached_Params->detached_params_2.freq = f_right;
+        State_Detached_Params->detached_params_3.freq = f_right;
     }
 }
 
@@ -376,4 +461,13 @@ void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t d
         y_want = -polar_diameter*sin(polar_angle*PI/180);
     }
     SetCartesianPositionAll_Delay(x_want,y_want,delaytime);
+}
+void ReverseMoveOpen(void)
+{
+    reverse_move_flag=1;
+}
+//关闭运动反向
+void ReverseMoveClose(void)
+{
+    reverse_move_flag=0;
 }

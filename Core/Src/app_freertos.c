@@ -52,6 +52,7 @@ osThreadId BlueteethTaskHandle;
 osThreadId GO1Init_TaskHandle;
 osThreadId GO1_OutputHandle;
 osThreadId VisualHandle;
+osThreadId NRFTaskHandle;
 osMessageQId VisialHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,6 +65,7 @@ void BlueTeeth_RemoteControl(void const * argument);
 void GO1Init(void const * argument);
 void GO1_outTask(void const * argument);
 void VisualTask(void const * argument);
+void NRF(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -119,6 +121,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(Visual, VisualTask, osPriorityHigh, 0, 256);
   VisualHandle = osThreadCreate(osThread(Visual), NULL);
 
+  /* definition and creation of NRFTask */
+  osThreadDef(NRFTask, NRF, osPriorityLow, 0, 512);
+  NRFTaskHandle = osThreadCreate(osThread(NRFTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
     vTaskResume(StartTaskHandle);
@@ -126,6 +132,7 @@ void MX_FREERTOS_Init(void) {
     vTaskSuspend(BlueteethTaskHandle);
     vTaskSuspend(GO1_OutputHandle);
     vTaskSuspend(VisualHandle);
+    vTaskSuspend(NRFTaskHandle);
   /* USER CODE END RTOS_THREADS */
 
 }
@@ -142,6 +149,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
+    Control_Flag(0,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -175,10 +183,10 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
-//      usart_printf("%f\n",Yaw_PID_Loop.Out_put);
-      usart_printf("%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_2.step_length);
 
-    osDelay(10);
+//      usart_printf("%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put);
+
+    osDelay(1);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
@@ -195,20 +203,23 @@ void GO1Init(void const * argument)
   /* USER CODE BEGIN GO1Init */
     MOTOR_Send_Init(); //初始化电机发送帧头
     Eight_PID_Init();//八个电机PID结构体初始化
-    ChangeGainOfPID(4.0f,0.0f,0.03f,0.05f);//初始化pid
+    ChangeGainOfPID(6.0f,0.0f,0.03f,0.05f);//初始化pid
 
     Get_motor_began_pos();       //获得各个电机的初始位
     EndPosture();                //锁住电机
 
     PID_Init(&Yaw_PID_Loop);
     ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);//陀螺仪PID初始化
+    PID_Init(&VisualLoop);
+    ChangeYawOfPID(5.0f,2.0f,100.0f,1.0f);//陀螺仪PID初始化
 
     printf("GO1 Init Ready\n");
     osDelay(3);
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
-//    vTaskResume(VisualHandle);
+    vTaskResume(NRFTaskHandle);
+    vTaskResume(VisualHandle);
     vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)
@@ -249,15 +260,33 @@ void GO1_outTask(void const * argument)
 void VisualTask(void const * argument)
 {
   /* USER CODE BEGIN VisualTask */
+
   /* Infinite loop */
   for(;;)
   {
-      if(visual.distance < 2.0f)
-          Turn('l','f');
+        visual_process();
 
-    osDelay(1);
+      osDelay(5);
   }
   /* USER CODE END VisualTask */
+}
+
+/* USER CODE BEGIN Header_NRF */
+/**
+* @brief Function implementing the NRFTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_NRF */
+void NRF(void const * argument)
+{
+  /* USER CODE BEGIN NRF */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END NRF */
 }
 
 /* Private application code --------------------------------------------------*/

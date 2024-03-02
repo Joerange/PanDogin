@@ -538,7 +538,7 @@ void Speed_Controll(void )
             {
                 //伪8自由度不对0号，3号，6号，9号电机进行控制。for循环从1开始，所以不用对0号电机判断
             } else{
-                SetPoint_Speed(&SpeedLoop[j],AngleLoop[j].Out_put);
+//                SetPoint_Speed(&SpeedLoop[j],AngleLoop[j].Out_put);
                 PID_PosLocCalc(&SpeedLoop[j],real_speed[j]);
             }
         }
@@ -574,7 +574,7 @@ void Speed_Controll02(void )
         //PID计算
         for(uint8_t j = 1;j < 9;j++)
         {
-            SetPoint_Speed(&SpeedLoop[j],AngleLoop[j].Out_put);
+//            SetPoint_Speed(&SpeedLoop[j],AngleLoop[j].Out_put);
             PID_PosLocCalc(&SpeedLoop[j],real_speed[j]);
         }
 

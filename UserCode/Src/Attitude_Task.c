@@ -9,11 +9,11 @@ enum DPStates dpstate = NONE;
 float NewHeartbeat = 0;//心跳值
 //全局姿态控制
 int Global_IMU_Control = 0;
-uint8_t Mark_flag = 0;
+float Direct = 0;
 
 void StandUp_Posture(void)
 {
-    AllLegsSpeedLimit(SpeedMode_FAST);
+    AllLegsSpeedLimit(SpeedMode_EARLYEX);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
 }
@@ -28,7 +28,6 @@ void LieDown_Posture(void)
 }
 void MarkingTime(void)
 {
-    Mark_flag = 1;
     AllLegsSpeedLimit(SpeedMode_FAST);
     ChangeGainOfPID(3.8f,0,0.6f,0);
 //    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
@@ -39,12 +38,13 @@ void MarkingTime(void)
 //实际运行Trot步态
 void Trot(float direction,int8_t kind)
 {
+    Direct = direction;
     switch(kind)
     {
         case 0://小步Trot
-            AllLegsSpeedLimit(SpeedMode_VERYFAST);
+            AllLegsSpeedLimit(SpeedMode_EXTREME);
             NewHeartbeat = 6;
-            ChangeGainOfPID(10.0f,0,0.6f,0);
+            ChangeGainOfPID(12.0f,0,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[4], direction);
             gait_detached(state_detached_params[4],0.0f, 0.5f, 0.5f, 0.0f,
@@ -52,11 +52,8 @@ void Trot(float direction,int8_t kind)
             break;
         case 1://大步Trot
             AllLegsSpeedLimit(SpeedMode_EXTREME);
-            NewHeartbeat = 4;
-//            Change_SinStateDetachedParams(&state_detached_params[1],1,1,15.0f,64,14.9f,13.5f,0.32f,4.0f);
-            ChangeGainOfPID(17.0f,1.0f,0.6f,0);
-            ChangeYawOfPID(5000.0f,10.0f,4000.0f,15.0f);
-            YawControl(yawwant, &state_detached_params[1], direction);
+            NewHeartbeat = 5;
+            ChangeGainOfPID(17.0f,0.0f,0.6f,0);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
@@ -90,11 +87,11 @@ void Turn(int state_flag,int speed_flag)
     }
     else if(speed_flag == 's')
     {
-        length = 5.0f;
-        state_detached_params[0].detached_params_0.freq = 1.5f;
-        state_detached_params[0].detached_params_1.freq = 1.5f;
-        state_detached_params[0].detached_params_2.freq = 1.5f;
-        state_detached_params[0].detached_params_3.freq = 1.5f;
+        length = 7.0f;
+        state_detached_params[0].detached_params_0.freq = 2.0f;
+        state_detached_params[0].detached_params_1.freq = 2.0f;
+        state_detached_params[0].detached_params_2.freq = 2.0f;
+        state_detached_params[0].detached_params_3.freq = 2.0f;
     }
 
     NewHeartbeat = 5;
@@ -148,28 +145,74 @@ void EndPosture(void)
     HAL_Delay(1);
 }
 
-void Dog_Posture(void)
+void Handshake(void)
 {
-    switch (gpstate) {
-        case HALT:
-            StandUp_Posture();
-            break;
-        case END:
-            LieDown_Posture();
-            break;
-        case TURN_LEFT:
-            Turn('l','s');
-            break;
-        case TURN_RIGHT:
-            Turn('r','s');
-            break;
-        case MARCH:
-            Walk(Forward,0);
-            break;
-        case MARCH_BACK:
-            Walk(Backward,0);
-            break;
-        default:
-            break;
-    }
+    //整体限制
+    AllLegsSpeedLimit(SpeedMode_SLOW);
+    ChangeGainOfPID(7.0f,0.0f,0.8f,0);
+    //左前腿
+    x =  LegLenthMax*cos((30)*PI/180);
+    y = -LegLenthMax*sin((30)*PI/180);
+    CartesianToTheta();
+    SetCoupledThetaPosition(0);
+    //其它腿
+    x =  LegLenthMin*cos(60*PI/180);
+    y =  LegLenthMin*sin(60*PI/180);
+    CartesianToTheta();
+    SetCoupledThetaPosition(1);
+    SetCoupledThetaPosition(2);
+    SetCoupledThetaPosition(3);
+    gpstate = STOP;
+
+}
+
+void StretchPosture(void)
+{
+    AllLegsSpeedLimit(SpeedMode_FAST);
+    x = -(LegStandLenth + 5) * cos(60 * PI / 180);
+    y = (LegStandLenth + 5) * sin(60 * PI / 180);
+    CartesianToTheta();
+    SetCoupledThetaPosition(1);
+    SetCoupledThetaPosition(3);
+    osDelay(800);
+    x = LegLenthMax * cos(30 * PI / 180);
+    y = LegLenthMax * sin(30 * PI / 180);
+    CartesianToTheta();
+    SetCoupledThetaPosition(0);
+    osDelay(1500);
+    SetCoupledThetaPosition(2);
+    gpstate = STOP;
+}
+
+void SquatPosture(void)
+{
+    x=0;
+    y=LegSquatLenth;
+    //控制
+    AllLegsSpeedLimit(SpeedMode_SLOW);
+    CartesianToTheta();//进行坐标转换
+    SetCoupledThetaPositionAll();
+    gpstate = STOP;
+    osDelay(400);
+}
+void FBwAaLitAir(void)
+{
+    /*自动转换*/
+    x=0;
+    y=-LegSquatLenth;
+    //使用低刚度和大量的阻尼来处理下降
+    ChangeGainOfPID(8.0,0.1,0.25,100);
+    AllLegsSpeedLimit(SpeedMode_SLOW);
+    //后腿反方向（向后）转动
+    ReverseMoveOpen();//方向反向控制
+    CartesianToTheta();
+    SetCoupledThetaPosition(1);
+    SetCoupledThetaPosition(3);
+    //前腿正常（向前）转动
+    ReverseMoveClose();//恢复（其实不写也没事儿）
+    CartesianToTheta();
+    SetCoupledThetaPosition(0);
+    SetCoupledThetaPosition(2);
+    gpstate = STOP;//回到停止态
+    osDelay(2000);
 }

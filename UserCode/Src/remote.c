@@ -67,10 +67,10 @@ void Remote_Controller(void)
             LieDown_Posture();
             break;
         case 6:
-            Turn('l','s');
+            Turn('l','f');
             break;
         case 7:
-            Turn('r','s');
+            Turn('r','f');
             break;
         case 10:
             Trot(Forward,1);
@@ -80,8 +80,21 @@ void Remote_Controller(void)
             break;
         case 20:
             ExecuteJump(Standard_Jump,60);
+            break;
+        case 21:
+            ExecuteJump(High_Jump,88);
+            break;
+        case 30:
+            SquatPosture();//蹲下
+            break;
+        case 31:
+            Handshake();//握手
+            break;
+        case 32:
+            StretchPosture();//伸展
+            break;
         case 33:
-            MarkingTime();
+            MarkingTime();//踏步
             break;
         default:
             break;

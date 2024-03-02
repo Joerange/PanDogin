@@ -66,4 +66,6 @@ void IMU_Data_Process(uint16_t rx_len);
 void uart_rx_angle_init(uint32_t bound);
 void AttitudeControl_Global(float roll_set,float pitch_set);
 uint8_t IMU_WaitAngle(uint8_t angle_type, float takeoff_inclination, float imu_angle_half_range, uint8_t lock, uint8_t second_flag);
+void Control_Flag(uint8_t IMU_Flag,uint8_t Visual_flag);
+
 #endif //MY_SCUDOG_IMU_H

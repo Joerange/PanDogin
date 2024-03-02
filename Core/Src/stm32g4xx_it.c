@@ -460,10 +460,8 @@ void UART5_IRQHandler(void)
     {
         __HAL_UART_CLEAR_IDLEFLAG(&huart5);//清除空闲中断接受标志wei
         HAL_UART_DMAStop(&huart5);//关闭DMA接受
-
-        HAL_UART_Receive_DMA(&huart5,(uint8_t *)&visual.data_8,Length_of_visual);//使能串口5 DMA接受
     }
-
+    HAL_UART_Receive_DMA(&huart5,(uint8_t *)&visual.data_8,Length_of_visual);//使能串口5 DMA接受
   /* USER CODE END UART5_IRQn 0 */
   HAL_UART_IRQHandler(&huart5);
   /* USER CODE BEGIN UART5_IRQn 1 */

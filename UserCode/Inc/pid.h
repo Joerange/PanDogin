@@ -38,13 +38,14 @@ typedef struct
 
 extern PIDTypeDef AngleLoop[9];
 extern PIDTypeDef SpeedLoop[9];
+extern PIDTypeDef VisualLoop;
 extern uint8_t OnlyPosLoop;
 extern PIDTypeDef Yaw_PID_Loop,Roll_PID_Loop,Pitch_PID_Loop;
 
 void PID_Init(PIDTypeDef *pid);
 void PID_Set_KP_KI_KD(PIDTypeDef *pid,float kp,float ki,float kd);
 void SetPoint(PIDTypeDef *pid,float want,uint8_t id);
-void SetPoint_Speed(PIDTypeDef *pid,float want);
+void SetPoint_Visual(PIDTypeDef *pid,float want);
 void PID_PosLocCalc(PIDTypeDef *pid,int32_t feedbackpos);
 void PID_IncCalc(PIDTypeDef *pid,int16_t feedbackspeed);
 void ChangeGainOfPID(float pos_kp,float pos_kd,float sp_kp,float sp_ki);
