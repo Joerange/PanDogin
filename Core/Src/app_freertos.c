@@ -149,7 +149,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(0,0);
+    Control_Flag(1,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -184,7 +184,7 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
-//      usart_printf("%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put);
+      usart_printf("%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put);
 
     osDelay(1);
   }
@@ -218,8 +218,8 @@ void GO1Init(void const * argument)
 
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
-    vTaskResume(NRFTaskHandle);
-    vTaskResume(VisualHandle);
+//    vTaskResume(NRFTaskHandle);
+//    vTaskResume(VisualHandle);
     vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)

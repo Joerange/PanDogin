@@ -15,24 +15,24 @@
 //#define offset_front_1 0.5346f
 //#define offset_back_0  0.1320f//(-121.9f)
 //#define offset_back_1  0.5346f//207.2f
-#define offset_front_0 0.2970f
-#define offset_front_1 0.8373f
-#define offset_back_0  0.3000f//(-121.9f)
-#define offset_back_1  0.8420f//207.2f
+#define offset_front_0 0.575f
+#define offset_front_1 1.098685f
+#define offset_back_0  0.575f//(-121.9f)
+#define offset_back_1  1.098685f//207.2f
 
 #define PI 3.1415926535f
 //大小腿长
-#define L1 15.0f //????100mm
-#define L2 27.85f//?ó??200mm
+#define L1 11.0f //????100mm
+#define L2 22.0f//?ó??200mm
 //腿长限位
-#define LegLenthExtremeMax 40.0f //
-#define LegLenthMax 38.0f //
-#define LegLenthMin 15.0f //
-#define LegStandLenth 22.0f //
+#define LegLenthExtremeMax 27.0f //
+#define LegLenthMax 25.0f //
+#define LegLenthMin 10.0f //
+#define LegStandLenth 16.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位
-#define StepLenthMin 18.5f
-#define StepLenthMax 26.5f //大小大概在45cm
+#define StepLenthMin 15.5f
+#define StepLenthMax 25.5f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
 #define StatesMaxNum 20
@@ -40,8 +40,8 @@
 #define LengthChange_Kp 5.0f
 #define freChange_Kp 1.67f
 
-#define freMAX 7.0f
-#define freMIN 4.0f
+#define freMAX 6.0f
+#define freMIN 1.5f
 
 #define MidPoint 100
 

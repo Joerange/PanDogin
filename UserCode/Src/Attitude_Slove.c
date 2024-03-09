@@ -78,20 +78,20 @@ void SetCoupledThetaPosition(int LegId)
     switch(LegId)
     {
         case 0:
-            AngleWant_MotorX[1]=TargetAngle1-offset_front_0;
-            AngleWant_MotorX[2]=TargetAngle2-offset_front_1;//+10.0f
+            AngleWant_MotorX[1]=-TargetAngle2+offset_front_1;
+            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0;//+10.0f
             break;
         case 1:
-            AngleWant_MotorX[3]=TargetAngle1-offset_back_0;//+5.0f
-            AngleWant_MotorX[4]=TargetAngle2-offset_back_1;
+            AngleWant_MotorX[3]=-TargetAngle2+offset_back_1;//+5.0f
+            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0;
             break;
         case 2:
-            AngleWant_MotorX[5]=-TargetAngle2+offset_front_1;//-4.0f
-            AngleWant_MotorX[6]=-TargetAngle1+offset_front_0;
+            AngleWant_MotorX[5]=TargetAngle1-offset_front_0;//-4.0f
+            AngleWant_MotorX[6]=TargetAngle2-offset_front_1;
             break;
         case 3:
-            AngleWant_MotorX[7]=-TargetAngle2+offset_back_1;
-            AngleWant_MotorX[8]=-TargetAngle1+offset_back_0;
+            AngleWant_MotorX[7]=TargetAngle1-offset_back_0-0.2f;
+            AngleWant_MotorX[8]=TargetAngle2-offset_back_1;
             break;
         default:
             break;
@@ -280,10 +280,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         {
 
             1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
-            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
-            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f},
-            {19.5f, 22.5f,  2.5f, 1.2f, 0.35f, 5.5f}
+            {17.0f, 20.0f,  2.5f, 0.2f, 0.35f, 3.0f},
+            {17.0f, 20.0f,  2.5f, 0.2f, 0.35f, 3.0f},
+            {17.0f, 20.0f,  2.5f, 0.2f, 0.35f, 3.0f},
+            {17.0f, 20.0f,  2.5f, 0.2f, 0.35f, 3.0f}
 
 
 

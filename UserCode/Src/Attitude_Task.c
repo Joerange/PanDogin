@@ -13,7 +13,7 @@ float Direct = 0;
 
 void StandUp_Posture(void)
 {
-    AllLegsSpeedLimit(SpeedMode_EARLYEX);
+    AllLegsSpeedLimit(SpeedMode_VERYFAST);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
 }
