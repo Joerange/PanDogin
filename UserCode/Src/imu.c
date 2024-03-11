@@ -165,7 +165,6 @@ void IMU_Data_Process(uint16_t rx_len)
         IMU_EulerAngle.EulerAngle[Pitch]-= Pitch_ErrorCorrection;
         IMU_EulerAngle.EulerAngle[Roll] -=Roll_ErrorCorrection;
     }
-//    usart_printf("%f\r\n",IMU_EulerAngle.EulerAngle[Yaw]);
 }
 
 void Control_Flag(uint8_t IMU_Flag,uint8_t Visual_flag)

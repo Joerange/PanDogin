@@ -149,7 +149,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(1,0);
+    Control_Flag(0,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -184,10 +184,10 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
-//      usart_printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_1.step_length,state_detached_params[1].detached_params_1.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq,state_detached_params[1].detached_params_3.step_length,state_detached_params[1].detached_params_3.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put
-//      );
+      usart_printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_1.step_length,state_detached_params[1].detached_params_1.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq,state_detached_params[1].detached_params_3.step_length,state_detached_params[1].detached_params_3.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put
+      );
 
-      usart_printf("%d,%d,%d,%d,%d,%d,%d,%d\n",end_pos[1],end_pos[2],end_pos[3],end_pos[4],end_pos[5],end_pos[6],end_pos[7],end_pos[8]);
+//      usart_printf("%d,%d,%d,%d,%d,%d,%d,%d\n",end_pos[1],end_pos[2],end_pos[3],end_pos[4],end_pos[5],end_pos[6],end_pos[7],end_pos[8]);
 
     osDelay(1);
   }

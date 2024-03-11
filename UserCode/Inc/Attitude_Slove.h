@@ -15,9 +15,9 @@
 //#define offset_front_1 0.5346f
 //#define offset_back_0  0.1320f//(-121.9f)
 //#define offset_back_1  0.5346f//207.2f
-#define offset_front_0 0.575f
+#define offset_front_0 0.57f
 #define offset_front_1 1.098685f
-#define offset_back_0  0.575f//(-121.9f)
+#define offset_back_0  0.57f//(-121.9f)
 #define offset_back_1  1.098685f//207.2f
 
 #define PI 3.1415926535f
@@ -40,8 +40,8 @@
 #define LengthChange_Kp 5.0f
 #define freChange_Kp 1.67f
 
-#define freMAX 6.0f
-#define freMIN 1.5f
+#define freMAX 7.0f
+#define freMIN 3.0f
 
 #define MidPoint 100
 

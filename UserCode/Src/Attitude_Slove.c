@@ -280,10 +280,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         {
 
             1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-            {17.0f, 20.0f,  2.5f, 0.5f, 0.33f, 4.5f},
-            {17.0f, 20.0f,  2.5f, 0.5f, 0.33f, 4.5f},
-            {17.0f, 20.0f,  2.5f, 0.5f, 0.33f, 4.5f},
-            {17.0f, 20.0f,  2.5f, 0.5f, 0.33f, 4.5f}
+            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f}
 
 
 
@@ -338,10 +338,10 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 8;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 8;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put;//左腿步长增加
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put;//左腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 10;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 10;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 5;//左腿步长增加
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 5;//左腿步长增加
         //步长限幅
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
