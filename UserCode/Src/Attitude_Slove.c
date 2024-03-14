@@ -18,7 +18,7 @@ float steplen = 0;
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
 //调试时用来改变生成的轨迹参数
 void Change_SinStateDetachedParams(DetachedParam *State,int8_t id,int8_t legid,float stance_height,float step_length,
-                                float up_amp,float down_amp,float flight_percent,float freq)
+                                   float up_amp,float down_amp,float flight_percent,float freq)
 {
     State[id].GaitID = id;
 
@@ -78,12 +78,12 @@ void SetCoupledThetaPosition(int LegId)
     switch(LegId)
     {
         case 0:
-            AngleWant_MotorX[1]=-TargetAngle2+offset_front_1;
-            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0;//+10.0f
+            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1;
+            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0;//+10.0f
             break;
         case 1:
-            AngleWant_MotorX[3]=-TargetAngle2+offset_back_1;//+5.0f
-            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0+0.01f;
+            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1;//+5.0f
+            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0+0.01f;
             break;
         case 2:
             AngleWant_MotorX[5]=TargetAngle1-offset_front_0;//-4.0f
@@ -127,9 +127,10 @@ void CartesianToTheta(void)
     double M=0;
     float A1=0,A2=0;
     //所需腿长计算及腿长限位
+    //L的范围是L1+-L2
     L=sqrt(pow(x,2) + pow(y,2));
     if(L<LegLenthMin) L=LegLenthMin;
-    else if(L>LegLenthExtremeMax) L=LegLenthExtremeMax;
+    else if(L > L1 + L2) L = L1 + L2 - 0.5;
     //根据腿长计算“中间角度”N和M。总体角度范围-180°~180°。
     N = asin(y / L) * 180.0 / PI;////角度范围为-90°~90°。
     if((x < 0)&&(y > 0)) N = 180 - N;////角度范围为90°~180°
@@ -279,35 +280,39 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
 
-            1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f}
+                1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+                {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+                {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+                {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
+                {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f}
+                // {21.0f, 23.0f,  2.5f, 0.8f, 0.32f, 1.0f},
+                // {21.0f, 23.0f,  2.5f, 0.8f, 0.32f, 1.0f},
+                // {21.0f, 23.0f,  2.5f, 0.8f, 0.32f, 1.0f},
+                // {21.0f, 23.0f,  2.5f, 0.8f, 0.32f, 1.0f}
 
 
 
         },
         {
-            2,//原地踏步//出现多种步态基高差距过大是会失效
-            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f}
+                2,//原地踏步//出现多种步态基高差距过大是会失效
+                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f}
         },
         {
-            3,//Walk步态（没有调好）
-            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f}
+                3,//Walk步态（没有调好）
+                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f}
         },
         {
-            4,//小步Trot（稳速）
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
+                4,//小步Trot（稳速）
+                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
 
         },
         {
