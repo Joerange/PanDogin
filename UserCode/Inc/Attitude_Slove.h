@@ -40,7 +40,7 @@
 #define LengthChange_Kp 5.0f
 #define freChange_Kp 1.67f
 
-#define freMAX 7.0f
+#define freMAX 9.0f
 #define freMIN 3.0f
 
 #define MidPoint 100
@@ -73,6 +73,7 @@ extern float AngleWant_MotorX[9];
 extern float x,y;
 extern float steplen;
 extern uint8_t Mark_flag;
+extern float Target_offset1,Target_offset2;
 
 void Get_Target(int theta1,int theta2);
 void SetCoupledThetaPositionAll(void);

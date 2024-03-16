@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "fdcan.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +53,7 @@ osThreadId GO1Init_TaskHandle;
 osThreadId GO1_OutputHandle;
 osThreadId VisualHandle;
 osThreadId NRFTaskHandle;
+osThreadId TripodHeadHandle;
 osMessageQId VisialHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +67,7 @@ void GO1Init(void const * argument);
 void GO1_outTask(void const * argument);
 void VisualTask(void const * argument);
 void NRF(void const * argument);
+void TripodHeadTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -125,9 +127,14 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(NRFTask, NRF, osPriorityLow, 0, 512);
   NRFTaskHandle = osThreadCreate(osThread(NRFTask), NULL);
 
+  /* definition and creation of TripodHead */
+  osThreadDef(TripodHead, TripodHeadTask, osPriorityNormal, 0, 256);
+  TripodHeadHandle = osThreadCreate(osThread(TripodHead), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
     vTaskResume(StartTaskHandle);
+    vTaskSuspend(TripodHeadHandle);
     vTaskSuspend(GO1Init_TaskHandle);
     vTaskSuspend(BlueteethTaskHandle);
     vTaskSuspend(GO1_OutputHandle);
@@ -149,7 +156,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(0,0);
+    Control_Flag(1,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -184,12 +191,10 @@ void BlueTeeth_RemoteControl(void const * argument)
   {
       Remote_Controller();
 
-      usart_printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_1.step_length,state_detached_params[1].detached_params_1.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq,state_detached_params[1].detached_params_3.step_length,state_detached_params[1].detached_params_3.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put
-      );
+      usart_printf("%f,%f,%d\n",visual.distance,visual.offset,gpstate);
+//      usart_printf("%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put);
 
-//      usart_printf("%d,%d,%d,%d,%d,%d,%d,%d\n",end_pos[1],end_pos[2],end_pos[3],end_pos[4],end_pos[5],end_pos[6],end_pos[7],end_pos[8]);
-
-    osDelay(1);
+    osDelay(5);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
@@ -214,7 +219,7 @@ void GO1Init(void const * argument)
     PID_Init(&Yaw_PID_Loop);
     ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);//陀螺仪PID初始化
     PID_Init(&VisualLoop);
-    ChangeYawOfPID(5.0f,2.0f,100.0f,1.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(100.0f,1.0f,4000.0f,15.0f);//陀螺仪PID初始化
 
     printf("GO1 Init Ready\n");
     osDelay(3);
@@ -222,7 +227,8 @@ void GO1Init(void const * argument)
     vTaskResume(GO1_OutputHandle);
     vTaskResume(BlueteethTaskHandle);
 //    vTaskResume(NRFTaskHandle);
-//    vTaskResume(VisualHandle);
+    vTaskResume(VisualHandle);
+    vTaskResume(TripodHeadHandle);
     vTaskSuspend(NULL); //电机初始化任务完成后自挂捏
   /* Infinite loop */
   for(;;)
@@ -290,6 +296,41 @@ void NRF(void const * argument)
     osDelay(1);
   }
   /* USER CODE END NRF */
+}
+
+/* USER CODE BEGIN Header_TripodHeadTask */
+/**
+* @brief Function implementing the TripodHead thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_TripodHeadTask */
+void TripodHeadTask(void const * argument)
+{
+  /* USER CODE BEGIN TripodHeadTask */
+    PID_Init(&M2006_Speed);
+    PID_Init(&M2006_Position);
+
+    PID_Set_KP_KI_KD(&M2006_Speed,3.0f,0.03f,0.0f);//2006电机速度环初始化
+    PID_Set_KP_KI_KD(&M2006_Position,0.4f,0.0f,0.01f);//2006电机位置环初始化
+
+    M2006_Speed.Output_limit = 4000;
+    M2006_Position.Output_limit = 10000;
+  /* Infinite loop */
+  for(;;)
+  {
+
+      SetPoint_IMU(&M2006_Position, AngleChange(TargetAngle));
+      PID_PosLocM2006(&M2006_Position,struct_debug1[0].total_angle);
+
+      SetPoint_IMU(&M2006_Speed, M2006_Position.Out_put);
+      PID_PosLocM2006(&M2006_Speed,struct_debug1[0].speed);
+
+      set_current(&hfdcan2,0x200,M2006_Speed.Out_put,0,0,0);
+
+    osDelay(5);
+  }
+  /* USER CODE END TripodHeadTask */
 }
 
 /* Private application code --------------------------------------------------*/

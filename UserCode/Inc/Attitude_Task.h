@@ -95,6 +95,7 @@ extern enum DPStates dpstate;
 extern float TargetAngle1,TargetAngle2;
 extern int Global_IMU_Control;
 extern float Direct;
+extern float TargetAngle;
 
 void MarkingTime(void);
 void StandUp_Posture(void);
@@ -109,5 +110,6 @@ void Handshake(void);
 void StretchPosture(void);
 void SquatPosture(void);
 void FBwAaLitAir(void);
+void Race_Competition(void);
 
 #endif //MY_SCUDOG_ATTITUDE_TASK_H

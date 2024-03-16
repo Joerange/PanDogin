@@ -10,6 +10,8 @@ float NewHeartbeat = 0;//心跳值
 //全局姿态控制
 int Global_IMU_Control = 0;
 float Direct = 0;
+float TargetAngle = 0;
+int Race_count = 0;
 
 void StandUp_Posture(void)
 {
@@ -43,6 +45,7 @@ void Trot(float direction,int8_t kind)
     {
         case 0://小步Trot
             AllLegsSpeedLimit(SpeedMode_EXTREME);
+            Target_offset2 = 0.112f;
             NewHeartbeat = 6;
             ChangeGainOfPID(12.0f,0,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
@@ -51,7 +54,8 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
-            AllLegsSpeedLimit(SpeedMode_VERYEX);
+            AllLegsSpeedLimit(SpeedMode_EXTREME);
+            Target_offset2 = 0.112f;
             NewHeartbeat = 5;
             ChangeGainOfPID(18.5f,0.0f,0.6f,0);
             ChangeYawOfPID(500.0f,5.0f,3000.0f,15.0f);
@@ -217,4 +221,35 @@ void FBwAaLitAir(void)
     SetCoupledThetaPosition(2);
     gpstate = STOP;//回到停止态
     osDelay(2000);
+}
+void Race_Competition(void)
+{
+    if(Race_count == 0 && visual.distance >= 70.0f)
+        Trot(Forward,1);
+    else if(visual.distance < 70.0f && Race_count == 0)
+    {
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -44.5f)
+        {
+            Turn('r','f');
+        }
+        visual.distance = 100.0f;
+        TargetAngle = -140;
+        Race_count++;
+    }
+    if(Race_count == 1)
+    {
+        Trot(Backward,1);
+    }
+    else if(visual.distance < 70.0f && Race_count == 1)
+    {
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -89.5f)
+        {
+            Turn('r','f');
+        }
+        visual.distance = 100.0f;
+        TargetAngle = 0;
+        Race_count++;
+    }
+    else if(Race_count == 2)
+        Trot(Forward,1);
 }

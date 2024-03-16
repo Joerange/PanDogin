@@ -13,6 +13,9 @@ float times = 0.0f;
 float x,y;
 uint8_t reverse_move_flag = 0;
 float steplen = 0;
+float Target_offset1 = 0.088f;
+float Target_offset2 = 0.111f;
+
 
 //用于复制上方状态数组作为永恒基准。
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
@@ -79,11 +82,11 @@ void SetCoupledThetaPosition(int LegId)
     {
         case 0:
             AngleWant_MotorX[1]=-TargetAngle2+offset_front_1;
-            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0;//+10.0f
+            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0 + Target_offset1;//+10.0f
             break;
         case 1:
             AngleWant_MotorX[3]=-TargetAngle2+offset_back_1;//+5.0f
-            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0+0.01f;
+            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0 + Target_offset2;
             break;
         case 2:
             AngleWant_MotorX[5]=TargetAngle1-offset_front_0;//-4.0f
@@ -280,13 +283,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         {
 
             1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f},
-            {21.0f, 23.0f,  2.5f, 1.2f, 0.32f, 6.0f}
-
-
-
+            {21.5f, 22.0f,  2.5f, 0.5f, 0.32f, 5.0f},
+            {21.5f, 22.0f,  2.5f, 0.5f, 0.32f, 5.0f},
+            {21.5f, 22.0f,  2.5f, 0.5f, 0.32f, 5.0f},
+            {21.5f, 22.0f,  2.5f, 0.5f, 0.32f, 5.0f}
         },
         {
             2,//原地踏步//出现多种步态基高差距过大是会失效
@@ -312,11 +312,11 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
 
-                5,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
-                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
-                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
-                {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f}
+            5,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+            {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+            {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+            {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
+            {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f}
 
 
 
@@ -338,10 +338,10 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 10;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 10;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 5;//左腿步长增加
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 5;//左腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 18;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 18;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 6;//左腿步长增加
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 6;//左腿步长增加
         //步长限幅
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
@@ -367,14 +367,14 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
-        State_Detached_Params->detached_params_0.freq = f_left;
-        State_Detached_Params->detached_params_1.freq = f_left;
+//        State_Detached_Params->detached_params_0.freq = f_left;
+//        State_Detached_Params->detached_params_1.freq = f_left;
 
         State_Detached_Params->detached_params_2.step_length = normal_step_right;
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
 
-        State_Detached_Params->detached_params_2.freq = f_right;
-        State_Detached_Params->detached_params_3.freq = f_right;
+//        State_Detached_Params->detached_params_2.freq = f_right;
+//        State_Detached_Params->detached_params_3.freq = f_right;
     }
     else if(visual_control_flag)
     {
@@ -384,13 +384,13 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         SetPoint_Visual(&VisualLoop,MidPoint);
         PID_PosLocCalc(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
         PID_PosLocCalc(&VisualLoop,visual.offset);
-        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
+        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put; VisualLoop.Out_put = -VisualLoop.Out_put;
         /**********步态控制*********/
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//左腿步长增加
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//左腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 18 - VisualLoop.Out_put * 3 ;//左腿步长增加
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 18 + VisualLoop.Out_put * 3;//右腿步长减小
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 6 - VisualLoop.Out_put * 3;//左腿步长增加
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 6 + VisualLoop.Out_put * 3;//左腿步长增加
         //步长限幅
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;

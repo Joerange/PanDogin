@@ -96,6 +96,9 @@ void Remote_Controller(void)
         case 33:
             MarkingTime();//Ì¤²½
             break;
+        case 37:
+            Race_Competition();
+            break;
         default:
             break;
     }
