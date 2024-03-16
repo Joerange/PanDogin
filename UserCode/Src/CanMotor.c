@@ -10,6 +10,10 @@
 
 moto_info_t struct_debug1[8];
 
+float AngleChange(float angle)
+{
+    return angle / 360 * 8192 * 36;
+}
 /**
  * @brief 对3508的反馈报文进行解包
  * @param ptr 目标电机
@@ -151,11 +155,9 @@ void set_current(FDCAN_HandleTypeDef *_hcan, int16_t id_range, int16_t current1,
     //发送成功了吗？失败就卡住了捏
     if ( HAL_FDCAN_AddMessageToTxFifoQ(_hcan, &TxHeader, TxData)!= HAL_OK)
     {
-        printf("TX_ERR\n");
+        usart_printf("TX_ERR\n");
         Error_Handler();
     }
-
-//    HAL_FDCAN_AddMessageToTxFifoQ(_hcan, &TxHeader, TxData);
 }
 
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)

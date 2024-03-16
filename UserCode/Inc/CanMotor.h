@@ -24,5 +24,6 @@ extern void MyFDCan1_config(void);
 extern void MyFDCan2_config(void);
 extern void MyFDCan3_config(void);
 extern void set_current(FDCAN_HandleTypeDef *_hcan, int16_t id_range, int16_t current1, int16_t current2, int16_t current3, int16_t current4);
+float AngleChange(float angle);
 
 #endif //MASTER_G4_DEMO_CANMOTOR_H

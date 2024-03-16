@@ -308,6 +308,7 @@ void TIM2_IRQHandler(void)
     {
         legcount = LEG_MINCOUNT + NewHearbet;
         times++;
+        //usart_printf("%f\n",times);
     }
 //    usart_printf("%f\r\n",times);
   /* USER CODE END TIM2_IRQn 1 */

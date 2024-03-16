@@ -59,6 +59,7 @@ void OpenRemote(void)
 
 void Remote_Controller(void)
 {
+
     switch (gpstate) {
         case 1:
             StandUp_Posture();
@@ -95,6 +96,9 @@ void Remote_Controller(void)
             break;
         case 33:
             MarkingTime();//Ì¤²½
+            break;
+        case 37:
+            Race_Competition();
             break;
         default:
             break;

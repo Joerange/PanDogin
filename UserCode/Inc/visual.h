@@ -22,6 +22,8 @@ extern osMessageQId VisialHandle;
 extern uint8_t VISUAL_REC[Length_of_visual];
 extern Visial_data visual;
 extern uint8_t visual_control_flag;
+extern float Distance;
+extern float distance[5];
 
 void visual_process(void);
 

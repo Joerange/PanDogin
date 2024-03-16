@@ -10,7 +10,6 @@ void Myinit(void)
 {
     MyFDCan1_config();
     MyFDCan2_config();
-    MyFDCan3_config();
     RetargetInit(&huart3);
     HAL_TIM_Base_Start_IT(&htim2);
 

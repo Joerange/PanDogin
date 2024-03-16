@@ -10,6 +10,8 @@ float NewHeartbeat = 0;//心跳值
 //全局姿态控制
 int Global_IMU_Control = 0;
 float Direct = 0;
+float TargetAngle = 0;
+int Race_count = 0;
 
 void StandUp_Posture(void)
 {
@@ -43,6 +45,7 @@ void Trot(float direction,int8_t kind)
     {
         case 0://小步Trot
             AllLegsSpeedLimit(SpeedMode_EXTREME);
+            Target_offset2 = 0.112f;
             NewHeartbeat = 6;
             ChangeGainOfPID(12.0f,0,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
@@ -51,10 +54,11 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
-            AllLegsSpeedLimit(SpeedMode_VERYEX);
+            AllLegsSpeedLimit(SpeedMode_EXTREME);
+            Target_offset2 = 0.112f;
             NewHeartbeat = 5;
             ChangeGainOfPID(18.5f,0.0f,0.6f,0);
-            ChangeYawOfPID(500.0f,5.0f,3000.0f,15.0f);
+            ChangeYawOfPID(0.4f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
@@ -217,4 +221,47 @@ void FBwAaLitAir(void)
     SetCoupledThetaPosition(2);
     gpstate = STOP;//回到停止态
     osDelay(2000);
+}
+void Race_Competition(void)
+{
+    if(Race_count == 0 && Distance >= 115.0f)
+        Trot(Forward,1);
+    if(Distance < 115.0f && Race_count == 0)
+    {
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -42.0f)
+        {
+            Turn('r','f');
+        }
+        for (int i = 0; i < 5; ++i) {
+            distance[i] = 300;
+        }
+        Distance = 300.0f;
+        visual.offset = 0;
+        TargetAngle = -149;
+        yawwant = -42.0f;
+        Race_count++;
+    }
+    if(Race_count == 1 && Distance >= 69.0f)
+    {
+        Trot(Backward,1);
+    }
+    if(Distance < 69.0f && Race_count == 1)
+    {
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -89.5f)
+        {
+            Turn('r','f');
+        }
+        for (int i = 0; i < 5; ++i) {
+            distance[i] = 300;
+        }
+        Distance = 300.0f;
+        visual.offset = 0;
+        TargetAngle = 0;
+        yawwant = -90.0f;
+        Race_count++;
+    }
+    if(Race_count == 2 && Distance >= 50.0f)
+        Trot(Forward,1);
+    if(Race_count == 2 && Distance < 50.0f)
+        StandUp_Posture();
 }

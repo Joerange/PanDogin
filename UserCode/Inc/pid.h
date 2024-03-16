@@ -41,6 +41,7 @@ extern PIDTypeDef SpeedLoop[9];
 extern PIDTypeDef VisualLoop;
 extern uint8_t OnlyPosLoop;
 extern PIDTypeDef Yaw_PID_Loop,Roll_PID_Loop,Pitch_PID_Loop;
+extern PIDTypeDef M2006_Speed,M2006_Position;
 
 void PID_Init(PIDTypeDef *pid);
 void PID_Set_KP_KI_KD(PIDTypeDef *pid,float kp,float ki,float kd);
@@ -53,5 +54,6 @@ void Eight_PID_Init(void );
 void Change_speed_kp(float K_W);
 void SetPoint_IMU(PIDTypeDef *pid,float want);
 void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float error,float output_limit);
+void PID_PosLocM2006(PIDTypeDef *pid, int32_t feedbackpos);//位置式
 
 #endif //DOG12_PID_H
