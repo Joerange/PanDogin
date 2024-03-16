@@ -19,4 +19,8 @@ enum JumpTypes
 };
 
 void ExecuteJump(uint8_t JumpType,float JumpAngle);
+void StairJump(uint8_t stage);
+void SeesawJump(uint8_t stage);
+void FrontFlipJump(uint8_t mode);
+void Bridge_Jump(uint8_t stage);
 #endif //ROBOMASTER_C_DEMO_JUMP_TASK_H

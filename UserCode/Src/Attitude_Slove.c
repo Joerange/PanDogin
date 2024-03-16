@@ -132,7 +132,7 @@ void CartesianToTheta(void)
     //所需腿长计算及腿长限位
     L=sqrt(pow(x,2) + pow(y,2));
     if(L<LegLenthMin) L=LegLenthMin;
-    else if(L>LegLenthExtremeMax) L=LegLenthExtremeMax;
+    else if(L>LegLenthExtremeMax) L=LegLenthExtremeMax;//L的范围是L1+-L2，最大为L1+L2
     //根据腿长计算“中间角度”N和M。总体角度范围-180°~180°。
     N = asin(y / L) * 180.0 / PI;////角度范围为-90°~90°。
     if((x < 0)&&(y > 0)) N = 180 - N;////角度范围为90°~180°
@@ -464,6 +464,38 @@ void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t d
         y_want = -polar_diameter*sin(polar_angle*PI/180);
     }
     SetCartesianPositionAll_Delay(x_want,y_want,delaytime);
+}
+//前/后腿的直角坐标控制
+void SetCartesianPositionFB_Delay(int Leg_FB,float x_want,float y_want,uint16_t delaytime)
+{
+    if(Leg_FB==Leg_Front)
+    {
+        SetCoupledCartesianPosition(1,x_want,y_want);
+        SetCoupledCartesianPosition(3,x_want,y_want);
+    }
+    else
+    {
+        SetCoupledCartesianPosition(2,x_want,y_want);
+        SetCoupledCartesianPosition(4,x_want,y_want);
+    }
+    osDelay(delaytime);
+}
+
+//前/后腿的极坐标控制
+void SetPolarPositionFB_Delay(uint8_t Legs_FB, float polar_angle,float polar_diameter,uint16_t delaytime)
+{
+    float x_want,y_want;
+    if(polar_angle>=0)
+    {
+        x_want = -polar_diameter*cos(polar_angle*PI/180);
+        y_want =  polar_diameter*sin(polar_angle*PI/180);
+    }
+    else
+    {
+        x_want =  polar_diameter*cos(polar_angle*PI/180);
+        y_want = -polar_diameter*sin(polar_angle*PI/180);
+    }
+    SetCartesianPositionFB_Delay(Legs_FB,x_want,y_want,delaytime);
 }
 void ReverseMoveOpen(void)
 {

@@ -9,6 +9,7 @@
 #include "Attitude_Task.h"
 #include "crc16.h"
 
+dog_leg_parameter DogLegsMotorXPID[8]={0};//核心存储数组之一
 PIDTypeDef AngleLoop[9];
 PIDTypeDef SpeedLoop[9];
 PIDTypeDef VisualLoop;
@@ -140,7 +141,37 @@ void ChangeGainOfPID(float pos_kp,float pos_kd,float sp_kp,float sp_ki)
         PID_Set_KP_KI_KD(&SpeedLoop[i],sp_kp,sp_ki,0);
     }
 }
-
+//相比上个函数，提供了调节速度环ki的api，调整更加灵活（位置环的ki仍然始终为0，因为作为外环没必要这么多参数，反而会增加太调节的难度）。
+void ChangeAllGainOfPID(float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd)
+{
+    for(uint8_t i=0; i<8; i++)
+    {
+        PID_Set_KP_KI_KD(&SpeedLoop[i],sp_kp,sp_ki,sp_kd);//速度环刚度调整
+        PID_Set_KP_KI_KD(&AngleLoop[i],pos_kp,0,pos_kd);//位置环刚度调整
+    }
+}
+//每个腿的PID的单独配置
+void LegPID_Set(uint8_t LegId,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd)
+{
+    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId].SpeedLoop,sp_kp,sp_ki,sp_kd);
+    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId].AngleLoop,pos_kp,0,pos_kd);
+    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId+1].SpeedLoop,sp_kp,sp_ki,sp_kd);
+    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId+1].AngleLoop,pos_kp,0,pos_kd);
+}
+//前、后腿的PID配置
+void FBLegsPID_Set(uint8_t Leg_FB,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd)
+{
+    if(Leg_FB==Leg_Front)
+    {
+        LegPID_Set(0,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+        LegPID_Set(2,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+    }
+    else
+    {
+        LegPID_Set(1,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+        LegPID_Set(3,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+    }
+}
 /*!
  * 修改陀螺仪PID参数
  * @param pos_kp
