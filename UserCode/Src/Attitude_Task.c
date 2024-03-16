@@ -58,7 +58,7 @@ void Trot(float direction,int8_t kind)
             Target_offset2 = 0.112f;
             NewHeartbeat = 5;
             ChangeGainOfPID(18.5f,0.0f,0.6f,0);
-            ChangeYawOfPID(500.0f,5.0f,3000.0f,15.0f);
+            ChangeYawOfPID(0.4f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
@@ -224,32 +224,44 @@ void FBwAaLitAir(void)
 }
 void Race_Competition(void)
 {
-    if(Race_count == 0 && visual.distance >= 70.0f)
+    if(Race_count == 0 && Distance >= 115.0f)
         Trot(Forward,1);
-    else if(visual.distance < 70.0f && Race_count == 0)
+    if(Distance < 115.0f && Race_count == 0)
     {
-        while (IMU_EulerAngle.EulerAngle[Yaw] > -44.5f)
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -42.0f)
         {
             Turn('r','f');
         }
-        visual.distance = 100.0f;
-        TargetAngle = -140;
+        for (int i = 0; i < 5; ++i) {
+            distance[i] = 300;
+        }
+        Distance = 300.0f;
+        visual.offset = 0;
+        TargetAngle = -149;
+        yawwant = -42.0f;
         Race_count++;
     }
-    if(Race_count == 1)
+    if(Race_count == 1 && Distance >= 69.0f)
     {
         Trot(Backward,1);
     }
-    else if(visual.distance < 70.0f && Race_count == 1)
+    if(Distance < 69.0f && Race_count == 1)
     {
         while (IMU_EulerAngle.EulerAngle[Yaw] > -89.5f)
         {
             Turn('r','f');
         }
-        visual.distance = 100.0f;
+        for (int i = 0; i < 5; ++i) {
+            distance[i] = 300;
+        }
+        Distance = 300.0f;
+        visual.offset = 0;
         TargetAngle = 0;
+        yawwant = -90.0f;
         Race_count++;
     }
-    else if(Race_count == 2)
+    if(Race_count == 2 && Distance >= 50.0f)
         Trot(Forward,1);
+    if(Race_count == 2 && Distance < 50.0f)
+        StandUp_Posture();
 }

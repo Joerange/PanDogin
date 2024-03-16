@@ -59,6 +59,7 @@ void OpenRemote(void)
 
 void Remote_Controller(void)
 {
+
     switch (gpstate) {
         case 1:
             StandUp_Posture();

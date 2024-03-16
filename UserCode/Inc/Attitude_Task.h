@@ -96,6 +96,7 @@ extern float TargetAngle1,TargetAngle2;
 extern int Global_IMU_Control;
 extern float Direct;
 extern float TargetAngle;
+extern int Race_count;
 
 void MarkingTime(void);
 void StandUp_Posture(void);

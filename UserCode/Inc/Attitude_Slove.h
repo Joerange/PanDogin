@@ -31,7 +31,7 @@
 #define LegStandLenth 16.0f //
 #define LegSquatLenth 11.2f //
 //腿长限位
-#define StepLenthMin 15.5f
+#define StepLenthMin 10.0f
 #define StepLenthMax 25.5f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
@@ -41,7 +41,7 @@
 #define freChange_Kp 1.67f
 
 #define freMAX 9.0f
-#define freMIN 3.0f
+#define freMIN 1.0f
 
 #define MidPoint 100
 
@@ -74,6 +74,7 @@ extern float x,y;
 extern float steplen;
 extern uint8_t Mark_flag;
 extern float Target_offset1,Target_offset2;
+extern float yaw_offset;
 
 void Get_Target(int theta1,int theta2);
 void SetCoupledThetaPositionAll(void);

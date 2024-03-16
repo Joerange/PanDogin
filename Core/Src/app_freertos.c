@@ -108,7 +108,7 @@ void MX_FREERTOS_Init(void) {
   StartTaskHandle = osThreadCreate(osThread(StartTask), NULL);
 
   /* definition and creation of BlueteethTask */
-  osThreadDef(BlueteethTask, BlueTeeth_RemoteControl, osPriorityAboveNormal, 0, 256);
+  osThreadDef(BlueteethTask, BlueTeeth_RemoteControl, osPriorityAboveNormal, 0, 512);
   BlueteethTaskHandle = osThreadCreate(osThread(BlueteethTask), NULL);
 
   /* definition and creation of GO1Init_Task */
@@ -156,7 +156,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(1,0);
+    Control_Flag(0,1);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -190,11 +190,11 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
+//      usart_printf("%f,%f,%f.%f\n", AngleLoop[1].Out_put,AngleLoop[2].Out_put,AngleLoop[3].Out_put,AngleLoop[4].Out_put);
+//      usart_printf("%f,%f,%d,%f,%f,%d,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put,Race_count,visual.distance,visual.offset,gpstate,x,y);
+      usart_printf("%f,%f,%f,%f,%f,%f\n",Yaw_PID_Loop.Setpoint,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put,state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_2.step_length,visual.offset);
 
-      usart_printf("%f,%f,%d\n",visual.distance,visual.offset,gpstate);
-//      usart_printf("%f,%f,%f,%f,%f,%f\n",state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put);
-
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END BlueTeeth_RemoteControl */
 }
@@ -219,7 +219,7 @@ void GO1Init(void const * argument)
     PID_Init(&Yaw_PID_Loop);
     ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);//陀螺仪PID初始化
     PID_Init(&VisualLoop);
-    ChangeYawOfPID(100.0f,1.0f,4000.0f,15.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(0.47f,0.04f,3000.0f,10.0f);//陀螺仪PID初始化
 
     printf("GO1 Init Ready\n");
     osDelay(3);
@@ -312,7 +312,7 @@ void TripodHeadTask(void const * argument)
     PID_Init(&M2006_Position);
 
     PID_Set_KP_KI_KD(&M2006_Speed,3.0f,0.03f,0.0f);//2006电机速度环初始化
-    PID_Set_KP_KI_KD(&M2006_Position,0.4f,0.0f,0.01f);//2006电机位置环初始化
+    PID_Set_KP_KI_KD(&M2006_Position,0.3f,0.0f,0.03f);//2006电机位置环初始化
 
     M2006_Speed.Output_limit = 4000;
     M2006_Position.Output_limit = 10000;

@@ -89,6 +89,9 @@ void PID_PosLocM2006(PIDTypeDef *pid, int32_t feedbackpos)//位置式
     pid->Out_put = pid->P * Now_Error +
                    pid->I * pid->SumError +
                    pid->D * d_Error;
+
+//    usart_printf("%f,%f,%f,%f,%f\n",Yaw_PID_Loop.P,Yaw_PID_Loop.D,Now_Error,d_Error,IMU_EulerAngle.EulerAngle[Yaw]);
+
     //限幅输出
     if(pid->Out_put     > pid->Output_limit) pid->Out_put= pid->Output_limit;
     else if(pid->Out_put<-pid->Output_limit) pid->Out_put=-pid->Output_limit;
