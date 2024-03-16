@@ -35,6 +35,11 @@ typedef struct
     float Last_Out_put;
     float Output_limit;
 }PIDTypeDef;
+typedef struct
+{
+    PIDTypeDef SpeedLoop;
+    PIDTypeDef AngleLoop;
+}dog_leg_parameter;
 
 extern PIDTypeDef AngleLoop[9];
 extern PIDTypeDef SpeedLoop[9];
@@ -50,6 +55,9 @@ void SetPoint_Visual(PIDTypeDef *pid,float want);
 void PID_PosLocCalc(PIDTypeDef *pid,int32_t feedbackpos);
 void PID_IncCalc(PIDTypeDef *pid,int16_t feedbackspeed);
 void ChangeGainOfPID(float pos_kp,float pos_kd,float sp_kp,float sp_ki);
+void ChangeAllGainOfPID(float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd);
+void LegPID_Set(uint8_t LegId,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd);
+void FBLegsPID_Set(uint8_t Leg_FB,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd);
 void Eight_PID_Init(void );
 void Change_speed_kp(float K_W);
 void SetPoint_IMU(PIDTypeDef *pid,float want);

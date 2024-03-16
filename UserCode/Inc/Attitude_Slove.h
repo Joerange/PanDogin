@@ -25,7 +25,7 @@
 #define L1 11.0f //????100mm
 #define L2 22.0f//?®Æ??200mm
 //Õ»≥§œﬁŒª
-#define LegLenthExtremeMax 27.0f //
+#define LegLenthExtremeMax 32.0f //
 #define LegLenthMax 25.0f //
 #define LegLenthMin 10.0f //
 #define LegStandLenth 16.0f //
@@ -72,7 +72,6 @@ extern DetachedParam StateDetachedParams_Copy[];
 extern float AngleWant_MotorX[9];
 extern float x,y;
 extern float steplen;
-extern uint8_t Mark_flag;
 extern float Target_offset1,Target_offset2;
 extern float yaw_offset;
 
@@ -85,6 +84,8 @@ void gait_detached(	DetachedParam d_params,
                        float leg0_direction, float leg1_direction,float leg2_direction, float leg3_direction);
 void Change_SinStateDetachedParams(DetachedParam *State,int8_t id,int8_t legid,float stance_height,float step_length,
                                    float up_amp,float down_amp,float flight_percent,float freq);
+void SetCartesianPositionFB_Delay(int Leg_FB,float x_want,float y_want,uint16_t delaytime);
+void SetPolarPositionFB_Delay(uint8_t Legs_FB, float polar_angle,float polar_diameter,uint16_t delaytime);
 void CartesianToTheta(void);
 void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId);
 void CoupledMoveLeg(float t, GaitParams params,float gait_offset, float leg_direction, int LegId, float angle);

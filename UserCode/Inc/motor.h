@@ -44,6 +44,8 @@ void Get_motor_began_pos3(void);
 void Get_motor_began_pos4(void);
 void Pos_Controll(uint8_t id,int32_t theat_set,uint8_t motor_mode,float KP,float KW);
 void AllLegsSpeedLimit(float speedlimit);
+void LegSpeedLimit(uint8_t LegId, float speedlimit);
+void FBLegsSpeedLimit(uint8_t Leg_FB, float speedlimit);
 void no1_2_LegsSpeedLimit(float speedlimit);
 void no3_4_LegsSpeedLimit(float speedlimit);
 void leg_pos_controll(void );

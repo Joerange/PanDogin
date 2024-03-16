@@ -417,6 +417,33 @@ void AllLegsSpeedLimit(float speedlimit)
     AngleLoop[8].Output_limit = speedlimit;
 }
 
+//每个腿的速度限制
+void LegSpeedLimit(uint8_t LegId, float speedlimit)
+{
+    AngleLoop[LegId].Output_limit = AngleLoop[LegId].Output_limit = speedlimit;
+}
+
+//前后腿的速度限制
+void FBLegsSpeedLimit(uint8_t Leg_FB, float speedlimit)
+{
+    if(Leg_FB==Leg_Front) {
+        //no.1 leg
+        AngleLoop[1].Output_limit = speedlimit;
+        AngleLoop[2].Output_limit = speedlimit;
+        //no.3 leg
+        AngleLoop[5].Output_limit = speedlimit;
+        AngleLoop[6].Output_limit = speedlimit;
+    }
+    else {
+        //no.2 leg
+        AngleLoop[3].Output_limit = speedlimit;
+        AngleLoop[4].Output_limit = speedlimit;
+        //no.4 leg
+        AngleLoop[7].Output_limit = speedlimit;
+        AngleLoop[8].Output_limit = speedlimit;
+    }
+}
+
 /**
  * 对1号腿和2号腿的速度进行限制
  * @param speedlimit 速度最大值

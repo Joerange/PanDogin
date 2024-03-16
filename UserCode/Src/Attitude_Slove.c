@@ -17,11 +17,11 @@ float Target_offset1 = 0.088f;
 float Target_offset2 = 0.111f;
 float yaw_offset = 0;
 
-//ç”¨äºå¤åˆ¶ä¸Šæ–¹çŠ¶æ€æ•°ç»„ä½œä¸ºæ°¸æ’åŸºå‡†ã€‚
+//ÓÃÓÚ¸´ÖÆÉÏ·½×´Ì¬Êı×é×÷ÎªÓÀºã»ù×¼¡£
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
-//è°ƒè¯•æ—¶ç”¨æ¥æ”¹å˜ç”Ÿæˆçš„è½¨è¿¹å‚æ•°
+//µ÷ÊÔÊ±ÓÃÀ´¸Ä±äÉú³ÉµÄ¹ì¼£²ÎÊı
 void Change_SinStateDetachedParams(DetachedParam *State,int8_t id,int8_t legid,float stance_height,float step_length,
-                                   float up_amp,float down_amp,float flight_percent,float freq)
+                                float up_amp,float down_amp,float flight_percent,float freq)
 {
     State[id].GaitID = id;
 
@@ -81,13 +81,12 @@ void SetCoupledThetaPosition(int LegId)
     switch(LegId)
     {
         case 0:
-
-            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1;
-            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0;//+10.0f
+            AngleWant_MotorX[1]=-TargetAngle2+offset_front_1;
+            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0 + Target_offset1;//+10.0f
             break;
         case 1:
-            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1;//+5.0f
-            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0+0.01f;
+            AngleWant_MotorX[3]=-TargetAngle2+offset_back_1;//+5.0f
+            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0 + Target_offset2;
             break;
         case 2:
             AngleWant_MotorX[5]=TargetAngle1-offset_front_0;//-4.0f
@@ -101,53 +100,52 @@ void SetCoupledThetaPosition(int LegId)
             break;
     }
 
-    //æ³¨æ„è§’åº¦èµ‹å€¼æ ¹æ®ä¸åŒçš„ç”µæœºé¡ºåºå’Œæ­£è´Ÿä¸åŒï¼ŒåŒæ—¶ä¹Ÿå—æœºæ¢°ç»“æœå®‰è£…çš„å½±å“ã€‚è‹¥æœ‰æ”¹åŠ¨ï¼Œåˆ™è¿™é‡Œçš„è§’åº¦çš„å¯¹åº”å…³ç³»ä¹Ÿè¦å˜ã€‚
+    //×¢Òâ½Ç¶È¸³Öµ¸ù¾İ²»Í¬µÄµç»úË³ĞòºÍÕı¸º²»Í¬£¬Í¬Ê±Ò²ÊÜ»úĞµ½á¹û°²×°µÄÓ°Ïì¡£ÈôÓĞ¸Ä¶¯£¬ÔòÕâÀïµÄ½Ç¶ÈµÄ¶ÔÓ¦¹ØÏµÒ²Òª±ä¡£
     /*
-    æ ¹æ®å¦‚ä¸‹è§’åº¦é…ç½®ä¿¡æ¯ï¼Œæˆ‘ä»¬å¯ä»¥å¾—åˆ°å¦‚ä¸‹ç»“è®ºï¼š
-    01å’Œ67å·ç”µæœº(ç”µæœºè®¾ç½®ä¸€è‡´ï¼‰ã€75å’Œ23å·ç”µæœºï¼ˆç”µæœºè®¾ç½®ä¸€è‡´ä¸”ä¸å‰è¿°ç”µæœºæ–¹å‘ç›¸åï¼‰åˆ†åˆ«å¯¹åº”ä¸¤æ¡å¯¹è§’çº¿ã€‚
+    ¸ù¾İÈçÏÂ½Ç¶ÈÅäÖÃĞÅÏ¢£¬ÎÒÃÇ¿ÉÒÔµÃµ½ÈçÏÂ½áÂÛ£º
+    01ºÍ67ºÅµç»ú(µç»úÉèÖÃÒ»ÖÂ£©¡¢75ºÍ23ºÅµç»ú£¨µç»úÉèÖÃÒ»ÖÂÇÒÓëÇ°Êöµç»ú·½ÏòÏà·´£©·Ö±ğ¶ÔÓ¦Á½Ìõ¶Ô½ÇÏß¡£
 
-                                     å¤´
-            å·¦å‰è…¿ /~**********************************~\å³å‰è…¿
+                                     Í·
+            ×óÇ°ÍÈ /~**********************************~\ÓÒÇ°ÍÈ
                     theta0 12 theta1  -theta1 56 -theta0
                      leftleg(usart1)	rightleg(usart2)
                    theta0 34 theta1  -theta1 78 -theta0
-            å·¦åè…¿ \~**********************************~/å³åè…¿
-                                     å°¾
+            ×óºóÍÈ \~**********************************~/ÓÒºóÍÈ
+                                     Î²
 
-    å¦‚ä¸Šå›¾æ‰€ç¤ºï¼š
-        2å’Œ3æ˜¯å‰è…¿å†…ä¾§ã€5å’Œ8æ˜¯åé€€å¤–ä¾§ï¼Œä»–ä»¬å‡å¯¹åº”theta0ï¼›åˆ2å’Œ3ç”µæœºæ˜¯å¯¹ç§°çš„è€Œéä¸€è‡´çš„ï¼Œå› æ­¤è§’åº¦æ–¹å‘è¦åå‘ä¸€ä¸‹ã€‚
-        å…¶å®ƒç”µæœºåŒç†ã€‚
+    ÈçÉÏÍ¼ËùÊ¾£º
+        2ºÍ3ÊÇÇ°ÍÈÄÚ²à¡¢5ºÍ8ÊÇºóÍËÍâ²à£¬ËûÃÇ¾ù¶ÔÓ¦theta0£»ÓÖ2ºÍ3µç»úÊÇ¶Ô³ÆµÄ¶ø·ÇÒ»ÖÂµÄ£¬Òò´Ë½Ç¶È·½ÏòÒª·´ÏòÒ»ÏÂ¡£
+        ÆäËüµç»úÍ¬Àí¡£
     */
 }
 /*
 * NAME: void CartesianToThetaGamma(void)
-* FUNCTION: ç¬›å¡å°”åæ ‡ï¼ˆè¶³ç«¯ç›´è§’åæ ‡ç³»ï¼‰è½¬æ¢åˆ°è§’åº¦åæ ‡ï¼ˆç”µæœºè§’åº¦åæ ‡ï¼‰ï¼Œ ä¹Ÿå°±æ˜¯å°†xyè½¬æ¢æˆthetaï¼Œè¿åŠ¨å­¦é€†è¿‡ç¨‹ï¼ˆæ ¸å¿ƒå‡½æ•°ï¼‰
-* æ•°æ®æµï¼šæ”¹å˜theta0å’Œtheta1çš„å€¼
-* éšè—å…¥å£å‚æ•°ï¼ˆå³åˆ©ç”¨å…¨å±€å˜é‡ï¼‰ï¼šxï¼Œyç›®æ ‡åæ ‡
+* FUNCTION: µÑ¿¨¶û×ø±ê£¨×ã¶ËÖ±½Ç×ø±êÏµ£©×ª»»µ½½Ç¶È×ø±ê£¨µç»ú½Ç¶È×ø±ê£©£¬ Ò²¾ÍÊÇ½«xy×ª»»³Étheta£¬ÔË¶¯Ñ§Äæ¹ı³Ì£¨ºËĞÄº¯Êı£©
+* Êı¾İÁ÷£º¸Ä±ätheta0ºÍtheta1µÄÖµ
+* Òş²ØÈë¿Ú²ÎÊı£¨¼´ÀûÓÃÈ«¾Ö±äÁ¿£©£ºx£¬yÄ¿±ê×ø±ê
 */
 void CartesianToTheta(void)
 {
     float L=0,N=0;
     double M=0;
     float A1=0,A2=0;
-    //æ‰€éœ€è…¿é•¿è®¡ç®—åŠè…¿é•¿é™ä½
-    //Lçš„èŒƒå›´æ˜¯L1+-L2
+    //ËùĞèÍÈ³¤¼ÆËã¼°ÍÈ³¤ÏŞÎ»
     L=sqrt(pow(x,2) + pow(y,2));
     if(L<LegLenthMin) L=LegLenthMin;
-    else if(L > L1 + L2) L = L1 + L2 - 0.5;
-    //æ ¹æ®è…¿é•¿è®¡ç®—â€œä¸­é—´è§’åº¦â€Nå’ŒMã€‚æ€»ä½“è§’åº¦èŒƒå›´-180Â°~180Â°ã€‚
-    N = asin(y / L) * 180.0 / PI;////è§’åº¦èŒƒå›´ä¸º-90Â°~90Â°ã€‚
-    if((x < 0)&&(y > 0)) N = 180 - N;////è§’åº¦èŒƒå›´ä¸º90Â°~180Â°
-    else if((x < 0)&&(y < 0)) N =-180-N;////è§’åº¦èŒƒå›´ä¸º-180Â°~-90Â°
-    M=acos(	( pow(L,2)+pow(L1,2)-pow(L2,2) )/(2*L1*L) )*180.0/PI;////ç»å¯¹çš„è§’åº¦å¤§å°ï¼Œè§’åº¦èŒƒå›´ä¸º0Â°~90Â°ã€‚
-    //åæ ‡è½¬æ¢ï¼ˆå…ˆä¸è€ƒè™‘offsetï¼Œåœ¨æœ€ç»ˆèµ‹å€¼å†è¿›è¡Œè°ƒæ•´ï¼‰ã€‚
+    else if(L>LegLenthExtremeMax) L=LegLenthExtremeMax;//LµÄ·¶Î§ÊÇL1+-L2£¬×î´óÎªL1+L2
+    //¸ù¾İÍÈ³¤¼ÆËã¡°ÖĞ¼ä½Ç¶È¡±NºÍM¡£×ÜÌå½Ç¶È·¶Î§-180¡ã~180¡ã¡£
+    N = asin(y / L) * 180.0 / PI;////½Ç¶È·¶Î§Îª-90¡ã~90¡ã¡£
+    if((x < 0)&&(y > 0)) N = 180 - N;////½Ç¶È·¶Î§Îª90¡ã~180¡ã
+    else if((x < 0)&&(y < 0)) N =-180-N;////½Ç¶È·¶Î§Îª-180¡ã~-90¡ã
+    M=acos(	( pow(L,2)+pow(L1,2)-pow(L2,2) )/(2*L1*L) )*180.0/PI;////¾ø¶ÔµÄ½Ç¶È´óĞ¡£¬½Ç¶È·¶Î§Îª0¡ã~90¡ã¡£
+    //×ø±ê×ª»»£¨ÏÈ²»¿¼ÂÇoffset£¬ÔÚ×îÖÕ¸³ÖµÔÙ½øĞĞµ÷Õû£©¡£
     A1=M+N-90;
     A2=90-(N-M);
-    //æœ€ç»ˆç¡®å®šç”µæœºè§’åº¦ã€‚è§’åº¦èŒƒå›´åˆ†åˆ«ä¸º0Â°~360Â°å’Œ-360Â°~0Â°ã€‚
+    //×îÖÕÈ·¶¨µç»ú½Ç¶È¡£½Ç¶È·¶Î§·Ö±ğÎª0¡ã~360¡ãºÍ-360¡ã~0¡ã¡£
     TargetAngle1=-(A1-90);
     TargetAngle2=-(A2-270);//
     //
-    if(reverse_move_flag == 1)//è¿åŠ¨åå‘æ§åˆ¶
+    if(reverse_move_flag == 1)//ÔË¶¯·´Ïò¿ØÖÆ
     {
         TargetAngle1-=360;
         TargetAngle2+=360;
@@ -158,53 +156,53 @@ void CartesianToTheta(void)
 }
 /*
 * NAME: SinTrajectory (float t,GaitParams params, float gaitOffset)
-* FUNCTION : æ­£å¼¦è½¨è¿¹ç”Ÿæˆå™¨ï¼ˆæ ¸å¿ƒå‡½æ•°ï¼‰ï¼Œç”¨åœ¨CoupledMoveLegå‡½æ•°ä¸­ã€‚
-* å…¥å£å‚æ•°ï¼š
-			tï¼šå¿ƒè·³æ§åˆ¶å˜é‡ï¼Œç”¨æ¥ä½“ç°æ—¶é—´çš„æµé€ã€‚æˆ‘ä»¬åœ¨ä¸Šå±‚å‚æ•°è¾“å…¥æ—¶ï¼Œè¾“å…¥çš„å®é™…ä¸Šæ˜¯ï¼štt=times*5/1000;å³ttçº¦æ¯5mså˜åŒ–5/1000å³ï¼Œ0.005ã€‚
-			GaitParamsï¼šæ­¥æ€æ§åˆ¶
-			gaitOffsetï¼šç›¸ä½å·®ï¼Œç”¨äºæ„æˆä¸åŒæ­¥æ€çš„æ ¸å¿ƒå‚æ•°ï¼ï¼
-			leg_diretionï¼šä»£è¡¨è…¿çš„å‰è¿›æˆ–åé€€
-			angleï¼š
-* å¾…ä¼˜åŒ–ï¼šåˆå§‹ç›¸ä½çš„æ§åˆ¶æ¯”è¾ƒé‡è¦ï¼Œå†³å®šäº†èµ·æ­¥çš„æ—¶å€™æ˜¯å¦å¹³ç¨³ï¼
+* FUNCTION : ÕıÏÒ¹ì¼£Éú³ÉÆ÷£¨ºËĞÄº¯Êı£©£¬ÓÃÔÚCoupledMoveLegº¯ÊıÖĞ¡£
+* Èë¿Ú²ÎÊı£º
+			t£ºĞÄÌø¿ØÖÆ±äÁ¿£¬ÓÃÀ´ÌåÏÖÊ±¼äµÄÁ÷ÊÅ¡£ÎÒÃÇÔÚÉÏ²ã²ÎÊıÊäÈëÊ±£¬ÊäÈëµÄÊµ¼ÊÉÏÊÇ£ºtt=times*5/1000;¼´ttÔ¼Ã¿5ms±ä»¯5/1000¼´£¬0.005¡£
+			GaitParams£º²½Ì¬¿ØÖÆ
+			gaitOffset£ºÏàÎ»²î£¬ÓÃÓÚ¹¹³É²»Í¬²½Ì¬µÄºËĞÄ²ÎÊı£¡£¡
+			leg_diretion£º´ú±íÍÈµÄÇ°½ø»òºóÍË
+			angle£º
+* ´ıÓÅ»¯£º³õÊ¼ÏàÎ»µÄ¿ØÖÆ±È½ÏÖØÒª£¬¾ö¶¨ÁËÆğ²½µÄÊ±ºòÊÇ·ñÆ½ÎÈ£¡
 */
 void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId)
 {
-//t=times*5/1000ï¼Œå³æ¯1så˜åŒ–1
-    //è·å–æ­£å¼¦å‡½æ•°çš„æ‰€è¦é…ç½®çš„å‚æ•°
-    float stanceHeight = params.stance_height;////ç‹—åº•ç›˜ç¦»åœ°é«˜åº¦
-    float downAMP = params.down_amp;////è´Ÿå³°å€¼
-    float upAMP = params.up_amp;////æ­£å³°å€¼
-    float flightPercent = params.flight_percent;////æ‘†åŠ¨ç›¸å æ¯”
-    float stepLength = params.step_length ;////æ­¥é•¿
-    float FREQ = params.freq;////é¢‘ç‡
-    if(leg_diretion<0) stepLength = -stepLength;////æ–¹å‘æ§åˆ¶
-    //åŸå§‹åæ ‡åˆå§‹åŒ–
+//t=times*5/1000£¬¼´Ã¿1s±ä»¯1
+    //»ñÈ¡ÕıÏÒº¯ÊıµÄËùÒªÅäÖÃµÄ²ÎÊı
+    float stanceHeight = params.stance_height;////¹·µ×ÅÌÀëµØ¸ß¶È
+    float downAMP = params.down_amp;////¸º·åÖµ
+    float upAMP = params.up_amp;////Õı·åÖµ
+    float flightPercent = params.flight_percent;////°Ú¶¯ÏàÕ¼±È
+    float stepLength = params.step_length ;////²½³¤
+    float FREQ = params.freq;////ÆµÂÊ
+    if(leg_diretion<0) stepLength = -stepLength;////·½Ïò¿ØÖÆ
+    //Ô­Ê¼×ø±ê³õÊ¼»¯
     float x0=0,y0=0;
-    /******ç›¸ä½ï¼ˆæ—¶é—´ã€å‘¨æœŸå¾ªç¯ï¼‰æ§åˆ¶******/
-    //ç›¸ä½æ—¶é—´ç´¯è®¡(è¦æƒ³å®ç°ä¸åŒè…¿ä¸åŒé¢‘ç‡ï¼Œå°±ä¸èƒ½å…±ç”¨ä¸€ä¸ªè¿™ä¸ªï¼Œè€Œåº”è¯¥å°†å…¶å˜ä¸ºè…¿éƒ¨å‚æ•°ç‰¹å¾)ã€‚
-    //ç”±äºtæ¯æ¬¡è¿›å…¥å‡½æ•°å˜åŒ–è‡³å°‘0.005ï¼Œå› æ­¤FREQç†è®ºä¸Šè¦å°äº200ã€‚å¦åˆ™ï¼Œpçš„å˜åŒ–é‡å°†å¤§äºç­‰äº1ï¼Œä»è€Œå¯¼è‡´è¿åŠ¨å‡ºé”™ã€‚
-    //ä¾‹å¦‚å½“FREQ=1æ—¶ï¼Œæ¯ç»è¿‡1sï¼Œtå˜åŒ–1ï¼Œè€Œpåˆšå¥½å˜åŒ–1ï¼Œæ•…æ­¤æ—¶é¢‘ç‡ä¸º1Hzï¼Œå½“FREQ=næ—¶ï¼Œé¢‘ç‡æ˜¾ç„¶å°±ä¸ºnHzã€‚æ•…é¢‘ç‡æœ€å¤§ä¸º200Hzã€‚
-    //å»ºè®®é¢‘ç‡ä¸è¦è¿‡å¤§ï¼Œå› ä¸ºé¢‘ç‡è¶Šå¤§æ„å‘³ç€é‡‡æ ·ç‚¹æ•°è¶Šå°‘ã€‚è€Œå®é™…ä¸Šæˆ‘ä»¬ä¸éœ€è¦é‚£ä¹ˆé«˜é¢‘ç‡ï¼Œåº”å°†é¢‘ç‡é™åˆ¶åœ¨0-5å¼€åŒºé—´èŒƒå›´å†…ã€‚
-    static float p = 0,prev_t = 0;//é¢‘ç‡*æ—¶é—´å˜åŒ–é‡å³ä¸ºç›¸ä½å˜åŒ–é‡ã€‚pæ¯æ¬¡å˜åŒ–æ‰€ç»å†çš„æ—¶é—´æ˜¯å›ºå®šçš„5msï¼Œ
-    // ä½†æˆ‘ä»¬å¯ä»¥é€šè¿‡æ”¹å˜æ¯æ¬¡å˜åŒ–çš„å¤§å°æ¥é—´æ¥ä»£æ›¿å˜åŒ–é¢‘ç‡ã€‚FREQè¶Šå¤§ï¼Œå•æ¬¡å˜åŒ–çš„å°±è¶Šå¤§ã€‚
+    /******ÏàÎ»£¨Ê±¼ä¡¢ÖÜÆÚÑ­»·£©¿ØÖÆ******/
+    //ÏàÎ»Ê±¼äÀÛ¼Æ(ÒªÏëÊµÏÖ²»Í¬ÍÈ²»Í¬ÆµÂÊ£¬¾Í²»ÄÜ¹²ÓÃÒ»¸öÕâ¸ö£¬¶øÓ¦¸Ã½«Æä±äÎªÍÈ²¿²ÎÊıÌØÕ÷)¡£
+    //ÓÉÓÚtÃ¿´Î½øÈëº¯Êı±ä»¯ÖÁÉÙ0.005£¬Òò´ËFREQÀíÂÛÉÏÒªĞ¡ÓÚ200¡£·ñÔò£¬pµÄ±ä»¯Á¿½«´óÓÚµÈÓÚ1£¬´Ó¶øµ¼ÖÂÔË¶¯³ö´í¡£
+    //ÀıÈçµ±FREQ=1Ê±£¬Ã¿¾­¹ı1s£¬t±ä»¯1£¬¶øp¸ÕºÃ±ä»¯1£¬¹Ê´ËÊ±ÆµÂÊÎª1Hz£¬µ±FREQ=nÊ±£¬ÆµÂÊÏÔÈ»¾ÍÎªnHz¡£¹ÊÆµÂÊ×î´óÎª200Hz¡£
+    //½¨ÒéÆµÂÊ²»Òª¹ı´ó£¬ÒòÎªÆµÂÊÔ½´óÒâÎ¶×Å²ÉÑùµãÊıÔ½ÉÙ¡£¶øÊµ¼ÊÉÏÎÒÃÇ²»ĞèÒªÄÇÃ´¸ßÆµÂÊ£¬Ó¦½«ÆµÂÊÏŞÖÆÔÚ0-5¿ªÇø¼ä·¶Î§ÄÚ¡£
+    static float p = 0,prev_t = 0;//ÆµÂÊ*Ê±¼ä±ä»¯Á¿¼´ÎªÏàÎ»±ä»¯Á¿¡£pÃ¿´Î±ä»¯Ëù¾­ÀúµÄÊ±¼äÊÇ¹Ì¶¨µÄ5ms£¬
+    // µ«ÎÒÃÇ¿ÉÒÔÍ¨¹ı¸Ä±äÃ¿´Î±ä»¯µÄ´óĞ¡À´¼ä½Ó´úÌæ±ä»¯ÆµÂÊ¡£FREQÔ½´ó£¬µ¥´Î±ä»¯µÄ¾ÍÔ½´ó¡£
     p += FREQ * (t - prev_t);//
-    float gp = fmod((p+gaitOffset),1.0);////è¯¥å‡½æ•°è¿”å› x/y çš„ä½™æ•°ï¼Œé™¤1.0è¡¨æ˜å–å°æ•°éƒ¨åˆ†ï¼Œå³å°†gpé™åˆ¶åœ¨0-1èŒƒå›´å†…ã€‚
-    prev_t = t;////å°†å½“å‰tå€¼ä¿å­˜ä¸‹æ¥ã€‚
-    /******æ­£å¼¦è½¨è¿¹ç”Ÿæˆ******/
-    //è¶³å°–æ‘†åŠ¨ç›¸
-    if (gp <= flightPercent) // //gpå°†ä»gaitOffsetå¼€å§‹ï¼Œå› æ­¤å½“gaitOffsetå¤§äºflightPercentæ—¶ï¼Œå°†ç›´æ¥è½¬åˆ°æ”¯æ’‘ç›¸ã€‚
+    float gp = fmod((p+gaitOffset),1.0);////¸Ãº¯Êı·µ»Ø x/y µÄÓàÊı£¬³ı1.0±íÃ÷È¡Ğ¡Êı²¿·Ö£¬¼´½«gpÏŞÖÆÔÚ0-1·¶Î§ÄÚ¡£
+    prev_t = t;////½«µ±Ç°tÖµ±£´æÏÂÀ´¡£
+    /******ÕıÏÒ¹ì¼£Éú³É******/
+    //×ã¼â°Ú¶¯Ïà
+    if (gp <= flightPercent) // //gp½«´ÓgaitOffset¿ªÊ¼£¬Òò´Ëµ±gaitOffset´óÓÚflightPercentÊ±£¬½«Ö±½Ó×ªµ½Ö§³ÅÏà¡£
     {
-        x0 = (gp/flightPercent)*stepLength - stepLength/2.0f;////ä»-stepLength/2åˆ°+stepLength/2ï¼Œç§»åŠ¨æ—¶é—´ä¸éšstepLengthæ”¹å˜ï¼Œæ•…stepLengthè¶Šå¤§å®é™…ç§»åŠ¨é€Ÿåº¦è¶Šå¿«ã€‚
-        y0 = -upAMP*sin(PI*gp/flightPercent) + stanceHeight;////å›´ç»•stanceHeightä¸ºåŸºç¡€è¿›è¡Œæ­£å¼¦æ³¢åŠ¨ã€‚åŒæ ·æ˜¯upAMPè¶Šå¤§ç§»åŠ¨é€Ÿåº¦è¶Šå¿«ã€‚
+        x0 = (gp/flightPercent)*stepLength - stepLength/2.0f;////´Ó-stepLength/2µ½+stepLength/2£¬ÒÆ¶¯Ê±¼ä²»ËæstepLength¸Ä±ä£¬¹ÊstepLengthÔ½´óÊµ¼ÊÒÆ¶¯ËÙ¶ÈÔ½¿ì¡£
+        y0 = -upAMP*sin(PI*gp/flightPercent) + stanceHeight;////Î§ÈÆstanceHeightÎª»ù´¡½øĞĞÕıÏÒ²¨¶¯¡£Í¬ÑùÊÇupAMPÔ½´óÒÆ¶¯ËÙ¶ÈÔ½¿ì¡£
     }
-        //è¶³å°–æ”¯æ’‘ç›¸
-    else ////æ‘†åŠ¨æ€»æ˜¯ä»æ­£å¼¦è½¨è¿¹çš„èµ·å§‹ä½ç½®å¤„æ‰§è¡Œã€‚
+        //×ã¼âÖ§³ÅÏà
+    else ////°Ú¶¯×ÜÊÇ´ÓÕıÏÒ¹ì¼£µÄÆğÊ¼Î»ÖÃ´¦Ö´ĞĞ¡£
     {
-        float percentBack = (gp-flightPercent)/(1.0f-flightPercent);//percentBackä¸(gp/flightPercent)æ˜¯ä¸€ä¸ªé“ç†
-        x0 = -percentBack*stepLength + stepLength/2.0f;////ä¸€èˆ¬æ¥è¯´ï¼Œé¦–æ¬¡è¿›å…¥æ—¶æ€»æ˜¯ä»stepLength/2å¼€å§‹ï¼Œç„¶åä¹‹åå°±å‘åè¿åŠ¨ã€‚
+        float percentBack = (gp-flightPercent)/(1.0f-flightPercent);//percentBackÓë(gp/flightPercent)ÊÇÒ»¸öµÀÀí
+        x0 = -percentBack*stepLength + stepLength/2.0f;////Ò»°ãÀ´Ëµ£¬Ê×´Î½øÈëÊ±×ÜÊÇ´ÓstepLength/2¿ªÊ¼£¬È»ºóÖ®ºó¾ÍÏòºóÔË¶¯¡£
         y0 = downAMP*sin(PI*percentBack) + stanceHeight;//
     }
-    ////ç»è¿‡åæ ‡ç³»è½¬æ¢åå¾—åˆ°æœ€ç»ˆç»“æœ(angleç›®å‰éƒ½æ˜¯0ï¼Œä»è€Œx=x0ï¼Œy=y0)
+    ////¾­¹ı×ø±êÏµ×ª»»ºóµÃµ½×îÖÕ½á¹û(angleÄ¿Ç°¶¼ÊÇ0£¬´Ó¶øx=x0£¬y=y0)
     x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
     y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
     //usart_printf("%f, %f\n", x, y);
@@ -212,27 +210,27 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
 }
 /*
 * NAME: CoupledMoveLeg
-* FUNCTION :ç‹—è…¿è¿åŠ¨çš„è€¦åˆæ§åˆ¶ï¼Œç”¨åœ¨gait_detachedå‡½æ•°ä¸­
-* å…¥å£å‚æ•°:
-	GaitParams ä¸€åªè…¿çš„å‚æ•°
-	gait_offset å§¿æ€ä¿®æ­£é‡
-	leg_diretion è…¿çš„å‰åæ–¹å‘ï¼Œ1ä¸ºå‰è¿›æ–¹å‘ï¼Œ-1ä¸ºåé€€æ–¹å‘
-	LegId è…¿å·
-	angle è§’åº¦
+* FUNCTION :¹·ÍÈÔË¶¯µÄñîºÏ¿ØÖÆ£¬ÓÃÔÚgait_detachedº¯ÊıÖĞ
+* Èë¿Ú²ÎÊı:
+	GaitParams Ò»Ö»ÍÈµÄ²ÎÊı
+	gait_offset ×ËÌ¬ĞŞÕıÁ¿
+	leg_diretion ÍÈµÄÇ°ºó·½Ïò£¬1ÎªÇ°½ø·½Ïò£¬-1ÎªºóÍË·½Ïò
+	LegId ÍÈºÅ
+	angle ½Ç¶È
 */
 void CoupledMoveLeg(float t, GaitParams params,float gait_offset, float leg_direction, int LegId, float angle)
 {
-    SinTrajectory(t,params,gait_offset,leg_direction,angle,LegId);//è¶³ç«¯æ­£å¼¦è½¨è¿¹ç”Ÿæˆå™¨
-    CartesianToTheta();//ç¬›å¡å°”åæ ‡è½¬æ¢åˆ°è§’åº¦åæ ‡
-    SetCoupledThetaPosition(LegId);//å‘é€æ•°æ®ç»™ç”µæœºé©±åŠ¨å‡½æ•°
+    SinTrajectory(t,params,gait_offset,leg_direction,angle,LegId);//×ã¶ËÕıÏÒ¹ì¼£Éú³ÉÆ÷
+    CartesianToTheta();//µÑ¿¨¶û×ø±ê×ª»»µ½½Ç¶È×ø±ê
+    SetCoupledThetaPosition(LegId);//·¢ËÍÊı¾İ¸øµç»úÇı¶¯º¯Êı
 }
 /*
 * NAME: gait_detached
-* FUNCTION : å››è…¿åˆ†ç¦»çš„è…¿éƒ¨æ§åˆ¶å‡½æ•°
-* å…¥å£å‚æ•°ï¼š
-	DetachedParam æ‰€è¦å®ç°çš„æ­¥æ€ä¿¡æ¯ï¼Œè¯¥ç»“æ„ä½“åŒ…å«æ¯ä¸ªé€€çš„æ­¥æ€ä¿¡æ¯
-	legx_offset   æ¯æ¡è…¿çš„ç›¸ä½å»¶æ—¶ï¼Œå¦‚trotæ­¥æ€2ã€3è…¿æœ‰0.5çš„å»¶æ—¶ï¼Œè€Œwalkæ­¥æ€åˆ™
-	legx_direction èµ°çš„æ–¹å‘
+* FUNCTION : ËÄÍÈ·ÖÀëµÄÍÈ²¿¿ØÖÆº¯Êı
+* Èë¿Ú²ÎÊı£º
+	DetachedParam ËùÒªÊµÏÖµÄ²½Ì¬ĞÅÏ¢£¬¸Ã½á¹¹Ìå°üº¬Ã¿¸öÍËµÄ²½Ì¬ĞÅÏ¢
+	legx_offset   Ã¿ÌõÍÈµÄÏàÎ»ÑÓÊ±£¬Èçtrot²½Ì¬2¡¢3ÍÈÓĞ0.5µÄÑÓÊ±£¬¶øwalk²½Ì¬Ôò
+	legx_direction ×ßµÄ·½Ïò
 */
 void gait_detached(	DetachedParam d_params,
                        float leg0_offset, float leg1_offset,float leg2_offset, float leg3_offset,
@@ -244,7 +242,7 @@ void gait_detached(	DetachedParam d_params,
     CoupledMoveLeg(tt,d_params.detached_params_2,leg2_offset,leg2_direction,2,step_angle[2]);
     CoupledMoveLeg(tt,d_params.detached_params_3,leg3_offset,leg3_direction,3,step_angle[3]);
 }
-//è°ƒè¯•è€ç‹—ä½¿ç”¨3508ç”µæœºéœ€è¦åšçš„å‡é€Ÿæ¯”è½¬æ¢ï¼Œå®‡æ ‘ç”µæœºç”¨ä¸åˆ°
+//µ÷ÊÔÀÏ¹·Ê¹ÓÃ3508µç»úĞèÒª×öµÄ¼õËÙ±È×ª»»£¬ÓîÊ÷µç»úÓÃ²»µ½
 /*
 void Output_Angle(void)
 {
@@ -254,7 +252,7 @@ void Output_Angle(void)
     }
 }
 */
-//èµ‹ç›®æ ‡é€Ÿåº¦å€¼
+//¸³Ä¿±êËÙ¶ÈÖµ
 void Get_Target(int theta1,int theta2)
 {
     TargetAngle1 = theta1;
@@ -263,58 +261,59 @@ void Get_Target(int theta1,int theta2)
 
 
 /*
- * ä¸ºäº†ä¸å½±å“ä»£ç é˜…è¯»ï¼Œå°†æ­£å¼¦ç”Ÿæˆæ›²çº¿ç‰¹å¾ç»“æ„ä½“æ•°ç»„æ”¾ç½®åœ¨æœ€åï¼Œé€šè¿‡Change_SinStateDetachedParams(DetachedParam *State,int8_t id,float stance_height,float step_length,
+ * ÎªÁË²»Ó°Ïì´úÂëÔÄ¶Á£¬½«ÕıÏÒÉú³ÉÇúÏßÌØÕ÷½á¹¹ÌåÊı×é·ÅÖÃÔÚ×îºó£¬Í¨¹ıChange_SinStateDetachedParams(DetachedParam *State,int8_t id,float stance_height,float step_length,
  * float up_amp,float down_amp,float flight_percent,float freq);
- * å‡½æ•°å¯¹ç‰¹å®šä½¿ç”¨çš„æ­£å¼¦ç”Ÿæˆæ›²çº¿ç‰¹å¾é‡è¿›è¡Œæ›´æ”¹ï¼Œå¯ä»¥åƒä¿®æ”¹pidçš„å‡½æ•°ç›´æ¥è¿›å…¥æ­¥æ€ä»»åŠ¡ä¸­ï¼Œ
- * ä¸‹æ–¹æ•°ç»„çš„åˆå§‹åŒ–å°†æ›´å¤šåœ°ä½œä¸ºä¸€ä¸ªè°ƒå¥½çš„å­˜å‚¨/æš‚å­˜åŒºåŸŸï¼Œå¯ä»¥çœå»gitçš„æ­¥éª¤
+ * º¯Êı¶ÔÌØ¶¨Ê¹ÓÃµÄÕıÏÒÉú³ÉÇúÏßÌØÕ÷Á¿½øĞĞ¸ü¸Ä£¬¿ÉÒÔÏñĞŞ¸ÄpidµÄº¯ÊıÖ±½Ó½øÈë²½Ì¬ÈÎÎñÖĞ£¬
+ * ÏÂ·½Êı×éµÄ³õÊ¼»¯½«¸ü¶àµØ×÷ÎªÒ»¸öµ÷ºÃµÄ´æ´¢/Ôİ´æÇøÓò£¬¿ÉÒÔÊ¡È¥gitµÄ²½Öè
  */
 DetachedParam state_detached_params[StatesMaxNum] = {
 
 
         {
-                0,//è½¬å¼¯ï¼ˆåœ¨è½¬å¼¯å‡½æ•°ä¸­ä¼šè°ƒæ•´è¯¥æ­¥æ€ä»¥å®ç°è½¬å¼¯ï¼‰
+                0,//×ªÍä£¨ÔÚ×ªÍäº¯ÊıÖĞ»áµ÷Õû¸Ã²½Ì¬ÒÔÊµÏÖ×ªÍä£©
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
-                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},// 6ä¸ªå‚æ•°å˜é‡ä¸ºstance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},// 6¸ö²ÎÊı±äÁ¿Îªstance_height; step_length; up_amp; down_amp; flight_percent; freq
                 {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f}
-//                0,//è½¬å¼¯ï¼ˆåœ¨è½¬å¼¯å‡½æ•°ä¸­ä¼šè°ƒæ•´è¯¥æ­¥æ€ä»¥å®ç°è½¬å¼¯ï¼‰
+//                0,//×ªÍä£¨ÔÚ×ªÍäº¯ÊıÖĞ»áµ÷Õû¸Ã²½Ì¬ÒÔÊµÏÖ×ªÍä£©
 //                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
 //                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
-//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},// 6ä¸ªå‚æ•°å˜é‡ä¸ºstance_height; step_length; up_amp; down_amp; flight_percent; freq
+//                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},// 6¸ö²ÎÊı±äÁ¿Îªstance_height; step_length; up_amp; down_amp; flight_percent; freq
 //                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f}
         },
         {
-            1,//å¤§æ­¥Trotï¼ˆå¿«é€Ÿï¼‰,ç°åœ¨æœ€é«˜ç‚¹yè½´åæ ‡åº”è¯¥å¤§äº15ï¼Œæœ€å¤§ä¸è¶…è¿‡32
+
+            1,//´ó²½Trot£¨¿ìËÙ£©,ÏÖÔÚ×î¸ßµãyÖá×ø±êÓ¦¸Ã´óÓÚ15£¬×î´ó²»³¬¹ı32
             {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
             {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
             {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
             {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f}
         },
         {
-                2,//åŸåœ°è¸æ­¥//å‡ºç°å¤šç§æ­¥æ€åŸºé«˜å·®è·è¿‡å¤§æ˜¯ä¼šå¤±æ•ˆ
-                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
-                {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f}
+            2,//Ô­µØÌ¤²½//³öÏÖ¶àÖÖ²½Ì¬»ù¸ß²î¾à¹ı´óÊÇ»áÊ§Ğ§
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f},
+            {16.0f, 0.0f,  0.8f, 10.0f, 0.25f, 3.0f}
         },
         {
-                3,//Walkæ­¥æ€ï¼ˆæ²¡æœ‰è°ƒå¥½ï¼‰
-                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
-                {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f}
+            3,//Walk²½Ì¬£¨Ã»ÓĞµ÷ºÃ£©
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f},
+            {15.0f, 20.0f,  5.0f, 5.0f, 0.18f, 2.1f}
         },
         {
-                4,//å°æ­¥Trotï¼ˆç¨³é€Ÿï¼‰
-                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-                {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
+            4,//Ğ¡²½Trot£¨ÎÈËÙ£©
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
 
         },
         {
 
-            5,//å¤§æ­¥Trotï¼ˆå¿«é€Ÿï¼‰,ç°åœ¨æœ€é«˜ç‚¹yè½´åæ ‡åº”è¯¥å¤§äº15ï¼Œæœ€å¤§ä¸è¶…è¿‡32
+            5,//´ó²½Trot£¨¿ìËÙ£©,ÏÖÔÚ×î¸ßµãyÖá×ø±êÓ¦¸Ã´óÓÚ15£¬×î´ó²»³¬¹ı32
             {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
             {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
             {20.0f, 22.5f,  2.5f, 1.2f, 0.3f, 5.5f},
@@ -326,25 +325,25 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 };
 
 
-//æ–°ç‰ˆIMUæ§åˆ¶åŸºäºä¸€ä¸ªå¤åˆ¶çš„åŸºå‡†è¿›è¡ŒIMUè°ƒèŠ‚ï¼Œé¿å…äº†å„ç§éå½’é›¶é€ æˆçš„BUGã€‚
+//ĞÂ°æIMU¿ØÖÆ»ùÓÚÒ»¸ö¸´ÖÆµÄ»ù×¼½øĞĞIMUµ÷½Ú£¬±ÜÃâÁË¸÷ÖÖ·Ç¹éÁãÔì³ÉµÄBUG¡£
 void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction)
 {
     float normal_step_left = 0,normal_step_right = 0;
     float f_left = 0,f_right = 0;
     if(IMU_Control_Flag)
     {
-        /*******IMUã®PIDç›¸å…³*******/
-        //PIDç›®æ ‡è®¾å®šï¼ˆä¸€èˆ¬éƒ½æ˜¯0ï¼Œé™¤äº†Pitchæœ‰æ—¶è¦æ±‚å®ƒæ˜¯ä¸€å®šè§’åº¦ï¼‰
+        /*******IMU¤ÎPIDÏà¹Ø*******/
+        //PIDÄ¿±êÉè¶¨£¨Ò»°ã¶¼ÊÇ0£¬³ıÁËPitchÓĞÊ±ÒªÇóËüÊÇÒ»¶¨½Ç¶È£©
         SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
         PID_PosLocCalc(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
-        /**********æ­¥æ€æ§åˆ¶*********/
-        //Yawè¾“å‡ºç»™æ­¥é•¿å‚æ•°
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 18;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 18;//å³è…¿æ­¥é•¿å‡å°
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 6;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 6;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        //æ­¥é•¿é™å¹…
+        /**********²½Ì¬¿ØÖÆ*********/
+        //YawÊä³ö¸ø²½³¤²ÎÊı
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put * 18;//×óÍÈ²½³¤Ôö¼Ó
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put * 18;//ÓÒÍÈ²½³¤¼õĞ¡
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put * 6;//×óÍÈ²½³¤Ôö¼Ó
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put * 6;//×óÍÈ²½³¤Ôö¼Ó
+        //²½³¤ÏŞ·ù
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
         else if(normal_step_right < StepLenthMin)
@@ -365,7 +364,7 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         else if(f_left < freMIN)
             f_left = freMIN;
 
-        //æœ€ç»ˆèµ‹å€¼ï¼ˆå‰é¢çš„æ­¥é•¿é™å¹…ä¿è¯äº†æ­¥é•¿å‚æ•°æ€»æ˜¯åœ¨åˆç†çš„èŒƒå›´å†…è€Œä¸ä¼šç–¯æ‰ï¼Œä»æ ¹æœ¬ä¸Šè§£å†³äº†å‡ºç°IMUæ§åˆ¶åæ‰BUGçš„å¯èƒ½æ€§ï¼‰
+        //×îÖÕ¸³Öµ£¨Ç°ÃæµÄ²½³¤ÏŞ·ù±£Ö¤ÁË²½³¤²ÎÊı×ÜÊÇÔÚºÏÀíµÄ·¶Î§ÄÚ¶ø²»»á·èµô£¬´Ó¸ù±¾ÉÏ½â¾öÁË³öÏÖIMU¿ØÖÆ»µµôBUGµÄ¿ÉÄÜĞÔ£©
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
@@ -380,8 +379,8 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
     }
     else if(visual_control_flag)
     {
-        /*******IMUã®PIDç›¸å…³*******/
-        //PIDç›®æ ‡è®¾å®šï¼ˆä¸€èˆ¬éƒ½æ˜¯0ï¼Œé™¤äº†Pitchæœ‰æ—¶è¦æ±‚å®ƒæ˜¯ä¸€å®šè§’åº¦ï¼‰
+        /*******IMU¤ÎPIDÏà¹Ø*******/
+        //PIDÄ¿±êÉè¶¨£¨Ò»°ã¶¼ÊÇ0£¬³ıÁËPitchÓĞÊ±ÒªÇóËüÊÇÒ»¶¨½Ç¶È£©
         SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
         SetPoint_Visual(&VisualLoop,MidPoint);
 
@@ -389,13 +388,13 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         PID_PosLocM2006(&VisualLoop,visual.offset);
 
         if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put; VisualLoop.Out_put = -VisualLoop.Out_put;
-        /**********æ­¥æ€æ§åˆ¶*********/
-        //Yawè¾“å‡ºç»™æ­¥é•¿å‚æ•°
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put - VisualLoop.Out_put ;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//å³è…¿æ­¥é•¿å‡å°
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//å·¦è…¿æ­¥é•¿å¢åŠ 
-        //æ­¥é•¿é™å¹…
+        /**********²½Ì¬¿ØÖÆ*********/
+        //YawÊä³ö¸ø²½³¤²ÎÊı
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put - VisualLoop.Out_put ;//×óÍÈ²½³¤Ôö¼Ó
+        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//ÓÒÍÈ²½³¤¼õĞ¡
+        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//×óÍÈ²½³¤Ôö¼Ó
+        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//×óÍÈ²½³¤Ôö¼Ó
+        //²½³¤ÏŞ·ù
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
         else if(normal_step_right < StepLenthMin)
@@ -416,7 +415,7 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         else if(f_left < freMIN)
             f_left = freMIN;
 
-        //æœ€ç»ˆèµ‹å€¼ï¼ˆå‰é¢çš„æ­¥é•¿é™å¹…ä¿è¯äº†æ­¥é•¿å‚æ•°æ€»æ˜¯åœ¨åˆç†çš„èŒƒå›´å†…è€Œä¸ä¼šç–¯æ‰ï¼Œä»æ ¹æœ¬ä¸Šè§£å†³äº†å‡ºç°IMUæ§åˆ¶åæ‰BUGçš„å¯èƒ½æ€§ï¼‰
+        //×îÖÕ¸³Öµ£¨Ç°ÃæµÄ²½³¤ÏŞ·ù±£Ö¤ÁË²½³¤²ÎÊı×ÜÊÇÔÚºÏÀíµÄ·¶Î§ÄÚ¶ø²»»á·èµô£¬´Ó¸ù±¾ÉÏ½â¾öÁË³öÏÖIMU¿ØÖÆ»µµôBUGµÄ¿ÉÄÜĞÔ£©
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
@@ -431,7 +430,7 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
     }
 }
 
-//ç›´æ¥è®¾ç½®æ‰€éœ€xï¼Œyä½ç½®è¿›è¡Œç”µæœºæ§åˆ¶
+//Ö±½ÓÉèÖÃËùĞèx£¬yÎ»ÖÃ½øĞĞµç»ú¿ØÖÆ
 void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
 {
     x=x_want;
@@ -440,7 +439,7 @@ void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
     SetCoupledThetaPosition(LegId);
 }
 
-//æ‰€æœ‰è…¿çš„ç›´è§’åæ ‡æ§åˆ¶
+//ËùÓĞÍÈµÄÖ±½Ç×ø±ê¿ØÖÆ
 void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 {
     SetCoupledCartesianPosition(0,x_want,y_want);
@@ -450,7 +449,7 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
     osDelay(delaytime);
 }
 
-//æ‰€æœ‰è…¿çš„æåæ ‡æ§åˆ¶
+//ËùÓĞÍÈµÄ¼«×ø±ê¿ØÖÆ
 void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime)
 {
     float x_want,y_want;
@@ -466,11 +465,43 @@ void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t d
     }
     SetCartesianPositionAll_Delay(x_want,y_want,delaytime);
 }
+//Ç°/ºóÍÈµÄÖ±½Ç×ø±ê¿ØÖÆ
+void SetCartesianPositionFB_Delay(int Leg_FB,float x_want,float y_want,uint16_t delaytime)
+{
+    if(Leg_FB==Leg_Front)
+    {
+        SetCoupledCartesianPosition(1,x_want,y_want);
+        SetCoupledCartesianPosition(3,x_want,y_want);
+    }
+    else
+    {
+        SetCoupledCartesianPosition(2,x_want,y_want);
+        SetCoupledCartesianPosition(4,x_want,y_want);
+    }
+    osDelay(delaytime);
+}
+
+//Ç°/ºóÍÈµÄ¼«×ø±ê¿ØÖÆ
+void SetPolarPositionFB_Delay(uint8_t Legs_FB, float polar_angle,float polar_diameter,uint16_t delaytime)
+{
+    float x_want,y_want;
+    if(polar_angle>=0)
+    {
+        x_want = -polar_diameter*cos(polar_angle*PI/180);
+        y_want =  polar_diameter*sin(polar_angle*PI/180);
+    }
+    else
+    {
+        x_want =  polar_diameter*cos(polar_angle*PI/180);
+        y_want = -polar_diameter*sin(polar_angle*PI/180);
+    }
+    SetCartesianPositionFB_Delay(Legs_FB,x_want,y_want,delaytime);
+}
 void ReverseMoveOpen(void)
 {
     reverse_move_flag=1;
 }
-//å…³é—­è¿åŠ¨åå‘
+//¹Ø±ÕÔË¶¯·´Ïò
 void ReverseMoveClose(void)
 {
     reverse_move_flag=0;
