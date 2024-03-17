@@ -81,20 +81,20 @@ void SetCoupledThetaPosition(int LegId)
     switch(LegId)
     {
         case 0:
-            AngleWant_MotorX[1]=-TargetAngle2+offset_front_1;
-            AngleWant_MotorX[2]=-TargetAngle1+offset_front_0 + Target_offset1;//+10.0f
+            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1;
+            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 + Target_offset1;//+10.0f
             break;
         case 1:
-            AngleWant_MotorX[3]=-TargetAngle2+offset_back_1;//+5.0f
-            AngleWant_MotorX[4]=-TargetAngle1+offset_back_0 + Target_offset2;
+            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1;//+5.0f
+            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 + Target_offset2;
             break;
         case 2:
-            AngleWant_MotorX[5]=TargetAngle1-offset_front_0;//-4.0f
-            AngleWant_MotorX[6]=TargetAngle2-offset_front_1;
+            AngleWant_MotorX[5]=TargetAngle1 - offset_front_0;//-4.0f
+            AngleWant_MotorX[6]=TargetAngle2 - offset_front_1;
             break;
         case 3:
-            AngleWant_MotorX[7]=TargetAngle1-offset_back_0;
-            AngleWant_MotorX[8]=TargetAngle2-offset_back_1;
+            AngleWant_MotorX[7]=TargetAngle1 - offset_back_0;
+            AngleWant_MotorX[8]=TargetAngle2 - offset_back_1;
             break;
         default:
             break;
@@ -305,10 +305,14 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
             4,//Ð¡²½Trot£¨ÎÈËÙ£©
+            /*{20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
-            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}
+            {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}*/
+                {19.0f, 10.0f,  1.0f, 0.5f, 0.3f, 1.6f},
+                {19.0f, 10.0f,  1.0f, 0.5f, 0.3f, 1.6f},
+                {19.0f, 10.0f,  1.0f, 0.5f, 0.3f, 1.6f},
+                {19.0f, 10.0f,  1.0f, 0.5f, 0.3f, 1.6f}
 
         },
         {
@@ -454,7 +458,7 @@ void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t d
 {
     float x_want,y_want;
 
-    usart_printf("%f,%f\n",AngleLoop[1].P,AngleLoop[1].D);
+    //usart_printf("%f,%f\n",AngleLoop[1].P,AngleLoop[1].D);
 
     if(polar_angle>=0)
     {

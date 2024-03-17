@@ -19,7 +19,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
         const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
         const float jump_extension = LegLenthMax; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
-        const float jump_flylegheight = LegStandLenth; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
+        const float jump_flylegheight = LegStandLenth + 2; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
         const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
@@ -62,26 +62,26 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
     {
         /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
         const uint16_t prep_time = 300;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
-        const uint16_t launch_time = 300;    //伸展腿的持续时间                  [s]  0.2
+        const uint16_t launch_time = 200;    //伸展腿的持续时间                  [s]  0.2
         const uint16_t fall_time = 100;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
-        const uint16_t strech_time = 300;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
+        const uint16_t strech_time = 150;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
         /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
         const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
         const float jump_extension = LegLenthMax; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
-        const float jump_flylegheight = LegStandLenth; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
+        const float jump_flylegheight = LegStandLenth + 4; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
         const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
         ChangeGainOfPID(8.0f,0.0f,0,0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(JumpAngle,stance_height,prep_time);
         //芜湖起飞（核心），持续时间为launch_time
-        AllLegsSpeedLimit(25.0f);//速度拉满
-        ChangeGainOfPID(19.0f,0,0,0);// 使用高刚度和低阻尼执行跳转
+        AllLegsSpeedLimit(30.0f);//速度拉满
+        ChangeGainOfPID(30.0f,0,0,0);// 使用高刚度和低阻尼执行跳转
         SetPolarPositionAll_Delay(JumpAngle,jump_extension,launch_time);
         //飞翔过程（也即降落过程）中的姿态（核心），持续时间为fall_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
-        ChangeGainOfPID(5.0f,0.0f,0,0);//使用低刚度和大量的阻尼来处理下降
-        SetPolarPositionAll_Delay(-25,jump_flylegheight,fall_time);
+        ChangeGainOfPID(5.0f,5.0f,0,0);//使用低刚度和大量的阻尼来处理下降
+        SetPolarPositionAll_Delay(-55,jump_flylegheight,fall_time);
         //脚用力准备站起来
         ChangeGainOfPID(6,0,0.0f,0.0f);//使用低刚度和大量的阻尼来处理下降
         SetPolarPositionAll_Delay(-88,jump_landlegheight,strech_time);
@@ -93,8 +93,8 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
         const uint16_t prep_time = 300;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
         const uint16_t launch_time = 200;    //伸展腿的持续时间                  [s]  0.2
-        const uint16_t fall_time = 350;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
-        const uint16_t strech_time = 300;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
+        const uint16_t fall_time = 150;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
+        const uint16_t strech_time = 250;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
         /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
         const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
         const float jump_extension = LegLenthMax; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
@@ -102,21 +102,21 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_EXTREME);
-        ChangeGainOfPID(8.0f,0.1f,70,0.22f);//使用刚度小，阻尼大的增益
+        ChangeGainOfPID(8.0f,0.1f,0.0f,0.0f);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(JumpAngle,stance_height,prep_time);
         //芜湖起飞（核心），持续时间为launch_time
-        AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);//速度拉满
-        ChangeAllGainOfPID(7.38f,0.1f,2.5f,222.5f,0.1f);// 使用高刚度和低阻尼执行跳转
+        AllLegsSpeedLimit(30);//速度拉满
+        ChangeGainOfPID(30.0f,0.1f,0.0f,0.0f);
         SetPolarPositionAll_Delay(JumpAngle,jump_extension,launch_time);
         //飞翔过程（也即降落过程）中的姿态（核心），持续时间为fall_time
         AllLegsSpeedLimit(SpeedMode_EXTREME);
-        ChangeGainOfPID(8,0.1f,70.0f,0);//使用低刚度和大量的阻尼来处理下降
-        SetPolarPositionAll_Delay(-25,jump_flylegheight,fall_time);
+        ChangeGainOfPID(9  ,2.1f,0.0f,0.0f);//使用低刚度和大量的阻尼来处理下降
+        SetPolarPositionAll_Delay(-55,jump_flylegheight,fall_time);
         //脚用力准备站起来
-        ChangeGainOfPID(6,0.1f,35.0f,0.3f);//使用低刚度和大量的阻尼来处理下降
-        SetPolarPositionAll_Delay(-70,jump_landlegheight,strech_time);
+        ChangeGainOfPID(9,2.1f,0.0f,0.0f);//使用低刚度和大量的阻尼来处理下降
+        SetPolarPositionAll_Delay(-80,jump_landlegheight,strech_time);
         //差不多站好了，执行完毕
-        gpstate = HALT;
+        gpstate = HALT_IMU;
     }
     else if(JumpType == Leap_Jump)//非常极限的四足同时跳。
     {
@@ -410,35 +410,35 @@ void Bridge_Jump(uint8_t stage)
             /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
             const uint16_t prep_time = 300;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
             const uint16_t launch_time=200;    //伸展腿的持续时间                  [s]  0.2
-            const uint16_t fall_time = 300;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
-            const uint16_t strech_time=450;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
+            const uint16_t fall_time = 130;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
+            const uint16_t strech_time=250;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
             /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
             const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
             const float jump_extension = LegLenthMax-1.0f; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
             const float jump_flylegheight = LegStandLenth-2; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
             const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
-            const float jump_angle = 66;
+            const float jump_angle = 75;
             //下蹲，准备起跳，持续时间为prep_time
             AllLegsSpeedLimit(SpeedMode_EXTREME);
-            ChangeAllGainOfPID(6.0f,0.2f,0.26f,25,0.22f);//使用刚度小，阻尼大的增益
-            SetPolarPositionAll_Delay(jump_angle,stance_height,prep_time);
+            ChangeGainOfPID(8.0f,0.1f,0.0f,0);//使用刚度小，阻尼大的增益
+            SetPolarPositionAll_Delay(jump_angle + IMU_EulerAngle.EulerAngle[Pitch],stance_height,prep_time);
             //芜湖起飞（核心），持续时间为launch_time
-            AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);//速度拉满
-            ChangeAllGainOfPID(6,0.1f,2.0f,200,0.1f);// 使用高刚度和低阻尼执行跳转
-            SetPolarPositionFB_Delay(Leg_Front,jump_angle,jump_extension,0);
-            SetPolarPositionFB_Delay(Leg_Back,jump_angle,jump_extension,launch_time);
+            AllLegsSpeedLimit(30);//速度拉满
+            ChangeGainOfPID(30.0f,0.1f,0.0f,0);// 使用高刚度和低阻尼执行跳转
+            SetPolarPositionFB_Delay(Leg_Front,jump_angle + IMU_EulerAngle.EulerAngle[Pitch],jump_extension,0);
+            SetPolarPositionFB_Delay(Leg_Back,jump_angle + IMU_EulerAngle.EulerAngle[Pitch],jump_extension,launch_time);
             //飞翔过程（也即降落过程）中的姿态（核心），持续时间为fall_time
             AllLegsSpeedLimit(SpeedMode_EXTREME);
-            ChangeGainOfPID(5,0.1f,35.0f,0);//使用低刚度和大量的阻尼来处理下降
-            SetPolarPositionAll_Delay(-25,jump_flylegheight,fall_time);
+            ChangeGainOfPID(8,0.1f,0.0f,0);//使用低刚度和大量的阻尼来处理下降
+            SetPolarPositionAll_Delay(-45,jump_flylegheight,fall_time);
             //脚用力准备站起来
             AllLegsSpeedLimit(SpeedMode_FAST);
-            ChangeAllGainOfPID(4,0.1f,0.04f,35.0f,0.3f);//使用低刚度和大量的阻尼来处理下降
+            ChangeGainOfPID(8,0.1f,0.0f,0);//使用低刚度和大量的阻尼来处理下降
             FBLegsPID_Set(Leg_Front,6,0.1f,0.08f,35,1.1f);
             FBLegsPID_Set(Leg_Back,6,0.1f,0.1f,130,1.1f);
             SetPolarPositionAll_Delay(-62,jump_landlegheight,strech_time);
             //差不多站好了，执行完毕
-            gpstate = HALT;
+            gpstate = HALT_IMU;
             break;
         }
         case 1:
