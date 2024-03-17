@@ -499,9 +499,6 @@ void leg_pos_controll(void )
     PID_PosLocCalc(&AngleLoop[7],end_pos[7]);
     PID_PosLocCalc(&AngleLoop[8],end_pos[8]);
 
-//    if(gpstate == 10 || gpstate == 11)
-//        usart_printf("%f\n",AngleLoop[1].Out_put);
-
 
     //如果只使用位置环，则需要直接将位置环的输出送给电机
     if(OnlyPosLoop)

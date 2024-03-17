@@ -453,6 +453,9 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime)
 {
     float x_want,y_want;
+
+    usart_printf("%f,%f\n",AngleLoop[1].P,AngleLoop[1].D);
+
     if(polar_angle>=0)
     {
         x_want = -polar_diameter*cos(polar_angle*PI/180);

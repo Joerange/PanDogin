@@ -8,7 +8,7 @@
 #include "stdint.h"
 
 //最大转速30rad/s(24V供电时)，最大力矩是23.7NM
-#define SpeedMode_VERYEX    25.0f
+#define SpeedMode_VERYEX    30.0f
 #define SpeedMode_EXTREME   20.0f           //官网说最快转速是30rad/s,这里留有一定裕量，用于跳跃使用
 #define SpeedMode_EARLYEX   15.0f
 #define SpeedMode_VERYFAST  10.0f
