@@ -61,7 +61,7 @@ void FBLegsPID_Set(uint8_t Leg_FB,float sp_kp,float sp_kd,float sp_ki,float pos_
 void Eight_PID_Init(void );
 void Change_speed_kp(float K_W);
 void SetPoint_IMU(PIDTypeDef *pid,float want);
-void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float error,float output_limit);
+void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float sum_error,float output_limit);
 void PID_PosLocM2006(PIDTypeDef *pid, int32_t feedbackpos);//位置式
 
 #endif //DOG12_PID_H

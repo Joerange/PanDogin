@@ -24,6 +24,7 @@ enum GPStates // 序号大小不应超过253（254是无状态，不可用于其它状态，否则IUM的PI
     HALT =1,             //立定（常用）
     KNEEL  =2,			 //坐下，四腿收缩
     END  =3,             //初始结束态,装死（常用）
+    HALT_IMU = 4,
     ROTAT_LEFT=6,      	 //原地左转（常用）
     ROTAT_RIGHT=7,     	 //原地右转（常用）
     TURN_LEFT= 8,        //左拐
@@ -100,6 +101,7 @@ extern int Race_count;
 
 void MarkingTime(void);
 void StandUp_Posture(void);
+void StandUp_Posture_IMU(void);
 void Test_Move(void);
 void Trot(float direction,int8_t kind);
 void Walk(float direction,uint8_t speed);

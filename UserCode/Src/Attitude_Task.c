@@ -15,9 +15,27 @@ int Race_count = 0;
 
 void StandUp_Posture(void)
 {
-    AllLegsSpeedLimit(SpeedMode_VERYFAST);
+    AllLegsSpeedLimit(SpeedMode_VERYFAST - 3);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
+}
+
+void StandUp_Posture_IMU(void)
+{
+    static float x_want = 0, y_want = 0;
+    AllLegsSpeedLimit(SpeedMode_VERYFAST - 3);
+
+    if (x_want == 0 && y_want == 0)
+    {
+        SetCartesianPositionAll_Delay(x_want,21.3,500);
+    }
+    if ((-90.0f + IMU_EulerAngle.EulerAngle[Pitch]) <= 0)
+    {
+        x_want =  21.3f * cosf((-90.0f + IMU_EulerAngle.EulerAngle[Pitch]) * PI / 180.0f);
+        y_want = -21.3f * sinf((-90.0f + IMU_EulerAngle.EulerAngle[Pitch]) * PI / 180.0f);
+    }
+
+    SetCartesianPositionAll_Delay(x_want,y_want,0);
 }
 
 void LieDown_Posture(void)
@@ -63,6 +81,15 @@ void Trot(float direction,int8_t kind)
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
             break;
+        case 3://к╚д╬ге
+            AllLegsSpeedLimit(SpeedMode_EARLYEX);
+            Target_offset2 = 0.112f;
+            NewHeartbeat = 4;
+            ChangeGainOfPID(15.5f,0.0f,0.6f,0);
+            ChangeYawOfPID(0.3f,0.01f,3000.0f,10.0f);
+            YawControl(yawwant, &state_detached_params[4], direction);
+            gait_detached(state_detached_params[4],0.0f, 0.5f, 0.5f, 0.0f,
+                          direction,direction,direction,direction);
         default:
             break;
     }

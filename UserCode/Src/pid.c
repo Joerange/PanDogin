@@ -177,11 +177,11 @@ void FBLegsPID_Set(uint8_t Leg_FB,float sp_kp,float sp_kd,float sp_ki,float pos_
  * @param pos_kp
  * @param pos_kd
  */
-void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float error,float output_limit)
+void ChangeYawOfPID(float Yaw_Kp,float Yaw_Kd,float sum_error,float output_limit)
 {
     Yaw_PID_Loop.P = Yaw_Kp;
     Yaw_PID_Loop.D = Yaw_Kd;
-    Yaw_PID_Loop.SumError_limit = error;
+    Yaw_PID_Loop.SumError_limit = sum_error;
     Yaw_PID_Loop.Output_limit = output_limit;
 }
 
