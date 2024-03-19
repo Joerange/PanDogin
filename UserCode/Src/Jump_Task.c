@@ -12,22 +12,22 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
     if (JumpType == Standard_Jump)//标准跳（对绝大多数地面都有较好的适应性，兼具高度和远度）
     {
         /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
-        const uint16_t prep_time = 300;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
-        const uint16_t launch_time = 300;    //伸展腿的持续时间                  [s]  0.2
-        const uint16_t fall_time = 100;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
-        const uint16_t strech_time = 800;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
+        const uint16_t prep_time = 350;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
+        const uint16_t launch_time = 270;    //伸展腿的持续时间                  [s]  0.2
+        const uint16_t fall_time = 150;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
+        const uint16_t strech_time = 650;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
         /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
         const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
         const float jump_extension = LegLenthMax; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
-        const float jump_flylegheight = LegStandLenth + 2; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
+        const float jump_flylegheight = LegStandLenth; //飞翔时腿长度   [cm]，经验上应介于LegLenthMax 28与LegStandLenth 18.0f之间，是一个适中的值。
         const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
         ChangeGainOfPID(6.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
-        SetPolarPositionAll_Delay(JumpAngle + 15, stance_height, prep_time);
+        SetPolarPositionAll_Delay(JumpAngle + 13, stance_height, prep_time);
         //芜湖起飞（核心），持续时间为launch_time
         AllLegsSpeedLimit(SpeedMode_VERYEX);//速度拉满
-        ChangeGainOfPID(50.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
+        ChangeGainOfPID(42.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(JumpAngle, jump_extension, launch_time);
         /*
         高刚度的实现：
@@ -56,7 +56,7 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         ChangeGainOfPID(8.0f, 0, 0, 0);//使用刚度小，阻尼大的增益
         SetPolarPositionAll_Delay(-70, jump_landlegheight, strech_time);
         //差不多站好了，执行
-        gpstate = HALT;
+        gpstate = 4;
     }
     else if(JumpType == High_Jump)//简单原地跳个高（任何地面都行）
     {

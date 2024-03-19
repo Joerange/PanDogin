@@ -156,7 +156,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(1,1);
+    Control_Flag(1,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -218,7 +218,9 @@ void GO1Init(void const * argument)
     EndPosture();                //锁住电机
 
     PID_Init(&Yaw_PID_Loop);
-    ChangeYawOfPID(1000.0f,10.0f,4000.0f,15.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(0.04f,0.04f,4000.0f,15.0f);//陀螺仪PID初始化
+    PID_Init(&Roll_PID_Loop);
+    ChangeYawOfPID(0.06f,0.06f,4000.0f,15.0f);//陀螺仪PID初始化
     PID_Init(&VisualLoop);
     ChangeYawOfPID(0.47f,0.04f,3000.0f,10.0f);//陀螺仪PID初始化
 

@@ -62,8 +62,8 @@ void Remote_Controller(void)
 
     switch (gpstate) {
         case 1:
-            // StandUp_Posture();
-            StandUp_Posture_IMU();
+             StandUp_Posture();
+//            StandUp_Posture_IMU();
             break;
         case 4:
             StandUp_Posture_IMU();
@@ -72,16 +72,16 @@ void Remote_Controller(void)
             LieDown_Posture();
             break;
         case 6:
-            Turn('l','f');
+            Turn('l','s');
             break;
         case 7:
-            Turn('r','f');
+            Turn('r','s');
             break;
         case 10:
-            Trot(Forward,3);
+            Trot(Forward,2);
             break;
         case 11:
-            Trot(Backward,1);
+            Trot(Backward,2);
             break;
         case 20:
             ExecuteJump(Standard_Jump,60);
