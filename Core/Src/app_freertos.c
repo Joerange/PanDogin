@@ -156,7 +156,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(1,0);
+    Control_Flag(0,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -193,7 +193,7 @@ void BlueTeeth_RemoteControl(void const * argument)
 //      usart_printf("%f,%f,%f.%f\n", AngleLoop[1].Out_put,AngleLoop[2].Out_put,AngleLoop[3].Out_put,AngleLoop[4].Out_put);
 //      usart_printf("%f,%f,%d,%f,%f,%d,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put,Race_count,visual.distance,visual.offset,gpstate,x,y);
 //      usart_printf("%f,%f,%f,%f,%f,%f\n",Yaw_PID_Loop.Setpoint,IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put,state_detached_params[1].detached_params_0.step_length,state_detached_params[1].detached_params_2.step_length,visual.offset);
-     usart_printf("%f,%f,%f\n", IMU_EulerAngle.EulerAngle[Yaw],IMU_EulerAngle.EulerAngle[Pitch],IMU_EulerAngle.EulerAngle[Roll]);
+        usart_printf("%f,%f,%f\n", IMU_EulerAngle.EulerAngle[Yaw],IMU_EulerAngle.EulerAngle[Pitch],IMU_EulerAngle.EulerAngle[Roll]);
 //       usart_printf("%d\n", gpstate);
     osDelay(1);
   }
@@ -212,17 +212,17 @@ void GO1Init(void const * argument)
   /* USER CODE BEGIN GO1Init */
     MOTOR_Send_Init(); //初始化电机发送帧头
     Eight_PID_Init();//八个电机PID结构体初始化
-    ChangeGainOfPID(6.0f,0.0f,0.03f,0.05f);//初始化pid
+    ChangeGainOfPID(6.0f,1.0f,0.03f,0.05f);//初始化pid
 
     Get_motor_began_pos();       //获得各个电机的初始位
     EndPosture();                //锁住电机
 
     PID_Init(&Yaw_PID_Loop);
-    ChangeYawOfPID(0.04f,0.04f,4000.0f,15.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(0.055f,0.05f,4000.0f,15.0f);//陀螺仪PID初始化
     PID_Init(&Roll_PID_Loop);
-    ChangeYawOfPID(0.06f,0.06f,4000.0f,15.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(0.6f,0.05f,4000.0f,15.0f);//陀螺仪PID初始化
     PID_Init(&VisualLoop);
-    ChangeYawOfPID(0.47f,0.04f,3000.0f,10.0f);//陀螺仪PID初始化
+    ChangeYawOfPID(0.6f,0.05f,4000.0f,15.0f);//陀螺仪PID初始化
 
     printf("GO1 Init Ready\n");
     osDelay(3);

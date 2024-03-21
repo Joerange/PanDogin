@@ -84,7 +84,7 @@ void Remote_Controller(void)
             Trot(Backward,2);
             break;
         case 20:
-            ExecuteJump(Standard_Jump,60);
+            ExecuteJump(Standard_Jump,58);
             break;
         case 21:
             ExecuteJump(High_Jump,88);

@@ -15,10 +15,7 @@
 //#define offset_front_1 0.5346f
 //#define offset_back_0  0.1320f//(-121.9f)
 //#define offset_back_1  0.5346f//207.2f
-#define offset_front_0 0.57f
-#define offset_front_1 1.098685f
-#define offset_back_0  0.57f//(-121.9f)
-#define offset_back_1  1.098685f//207.2f
+
 
 #define PI 3.1415926535f
 //大小腿长
@@ -31,7 +28,7 @@
 #define LegStandLenth 16.0f //
 #define LegSquatLenth 12.0f //
 //腿长限位
-#define StepLenthMin 10.0f
+#define StepLenthMin 8.5f
 #define StepLenthMax 25.5f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置

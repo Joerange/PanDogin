@@ -98,6 +98,7 @@ extern int Global_IMU_Control;
 extern float Direct;
 extern float TargetAngle;
 extern int Race_count;
+extern uint8_t IMU_Stand_flag;
 
 void MarkingTime(void);
 void StandUp_Posture(void);

@@ -12,9 +12,12 @@ int Global_IMU_Control = 0;
 float Direct = 0;
 float TargetAngle = 0;
 int Race_count = 0;
+uint8_t IMU_Stand_flag = 0;
 
 void StandUp_Posture(void)
 {
+    IMU_Stand_flag = 0;
+    ChangeGainOfPID(6.0f,0.2f,0.03f,0.05f);//≥ı ºªØpid
     AllLegsSpeedLimit(SpeedMode_VERYFAST);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
@@ -23,7 +26,7 @@ void StandUp_Posture(void)
 void StandUp_Posture_IMU(void)
 {
     static float x_want = 0, y_want = 0;
-    AllLegsSpeedLimit(SpeedMode_VERYFAST - 3);
+    AllLegsSpeedLimit(SpeedMode_VERYFAST);
 
     if (x_want == 0 && y_want == 0)
     {
@@ -34,6 +37,8 @@ void StandUp_Posture_IMU(void)
         x_want =  21.3f * cosf((-90.0f + IMU_EulerAngle.EulerAngle[Pitch]) * PI / 180.0f);
         y_want = -21.3f * sinf((-90.0f + IMU_EulerAngle.EulerAngle[Pitch]) * PI / 180.0f);
     }
+
+    IMU_Stand_flag = 1;
 
     SetCartesianPositionAll_Delay(x_want,y_want,0);
 }
@@ -49,7 +54,7 @@ void LieDown_Posture(void)
 void MarkingTime(void)
 {
     AllLegsSpeedLimit(SpeedMode_FAST);
-    ChangeGainOfPID(3.8f,0,0.6f,0);
+    ChangeGainOfPID(3.8f,0.2f,0.6f,0);
 //    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
 //    YawControl(yawwant, &state_detached_params[2], 1.0f);
     gait_detached(state_detached_params[2],0.0f, 0.5f, 0.5f, 0.0f,
@@ -65,7 +70,7 @@ void Trot(float direction,int8_t kind)
             AllLegsSpeedLimit(SpeedMode_EXTREME);
             Target_offset2 = 0.112f;
             NewHeartbeat = 6;
-            ChangeGainOfPID(12.0f,0,0.6f,0);
+            ChangeGainOfPID(12.0f,0.2f,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[4], direction);
             gait_detached(state_detached_params[4],0.0f, 0.5f, 0.5f, 0.0f,
@@ -75,7 +80,7 @@ void Trot(float direction,int8_t kind)
             AllLegsSpeedLimit(SpeedMode_EXTREME);
             Target_offset2 = 0.112f;
             NewHeartbeat = 5;
-            ChangeGainOfPID(18.5f,0.0f,0.6f,0);
+            ChangeGainOfPID(18.5f,0.2f,0.6f,0);
             ChangeYawOfPID(0.4f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
@@ -85,7 +90,7 @@ void Trot(float direction,int8_t kind)
             AllLegsSpeedLimit(SpeedMode_EARLYEX);
             Target_offset2 = 0.112f;
             NewHeartbeat = 4;
-            ChangeGainOfPID(15.5f,0.0f,0.6f,0);
+            ChangeGainOfPID(15.5f,0.2f,0.6f,0);
             ChangeYawOfPID(0.35f,0.035f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[4], direction);
             gait_detached(state_detached_params[4],0.0f, 0.5f, 0.5f, 0.0f,
@@ -130,7 +135,7 @@ void Turn(int state_flag,int speed_flag)
 
     NewHeartbeat = 5;
     AllLegsSpeedLimit(SpeedMode_EXTREME);
-    ChangeGainOfPID(10.0f,0,0.6f,0);
+    ChangeGainOfPID(10.0f,0.2f,0.6f,0);
     switch (state_flag) {
         case 'l':
             state_detached_params[0].detached_params_0.step_length = -length;

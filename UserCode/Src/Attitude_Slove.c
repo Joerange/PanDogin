@@ -16,6 +16,10 @@ float steplen = 0;
 float Target_offset1 = 0.088f;
 float Target_offset2 = 0.111f;
 float yaw_offset = 0;
+float offset_front_0 = 0.57f;
+float offset_front_1 = 1.098685f;
+float offset_back_0 = 0.57f;//(-121.9f)
+float offset_back_1 = 1.098685f;//207.2f
 
 //用于复制上方状态数组作为永恒基准。
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
@@ -81,22 +85,24 @@ void SetCoupledThetaPosition(int LegId)
     switch(LegId)
     {
         case 0:
-            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1;
-//            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 + Roll_PID_Loop.Out_put;//+10.0f
-            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 + Target_offset1;//+10.0f
+            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+//            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 - Roll_PID_Loop.Out_put;//+10.0f
+//            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 + Target_offset1;//+10.0f
             break;
         case 1:
-            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1;//+5.0f
-//            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 + Roll_PID_Loop.Out_put;
-            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 + Target_offset2;
+            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//+5.0f
+            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+//            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 - Roll_PID_Loop.Out_put;
+//            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 + Target_offset2;
             break;
         case 2:
-            AngleWant_MotorX[5]=TargetAngle1 - offset_front_0;//-4.0f
-            AngleWant_MotorX[6]=TargetAngle2 - offset_front_1;
+            AngleWant_MotorX[5]=TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//-4.0f
+            AngleWant_MotorX[6]=TargetAngle2 - offset_front_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
             break;
         case 3:
-            AngleWant_MotorX[7]=TargetAngle1 - offset_back_0;
-            AngleWant_MotorX[8]=TargetAngle2 - offset_back_1;
+            AngleWant_MotorX[7]=TargetAngle1 - offset_back_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+            AngleWant_MotorX[8]=TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
             break;
         default:
             break;
@@ -147,6 +153,22 @@ void CartesianToTheta(void)
     TargetAngle1=-(A1-90);
     TargetAngle2=-(A2-270);//
     //
+
+//    if(IMU_Stand_flag == 1)
+//    {
+//        offset_front_0 = -AngleWant_MotorX[5] - 0;
+//        offset_front_1 = -AngleWant_MotorX[6] - PI;
+//        offset_back_0 = -AngleWant_MotorX[5] - 0;
+//        offset_back_1 = -AngleWant_MotorX[6] - PI;
+//    }
+//    else if(IMU_Stand_flag == 0)
+//    {
+//        offset_front_0 = 0.57f;
+//        offset_front_1 = 1.098685f;
+//        offset_back_0 = 0.57f;//(-121.9f)
+//        offset_back_1 = 1.098685f;//207.2f
+//    }
+
     if(reverse_move_flag == 1)//运动反向控制
     {
         TargetAngle1-=360;
@@ -311,10 +333,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}*/
-                {19.0f, 13.5f,  2.0f, 0.5f, 0.3f, 1.9f},
-                {19.0f, 13.5f,  2.0f, 0.5f, 0.3f, 1.9f},
-                {19.0f, 13.5f,  2.0f, 0.5f, 0.3f, 1.9f},
-                {19.0f, 13.5f,  2.0f, 0.5f, 0.3f, 1.9f}
+                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
+                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
+                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
+                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f}
 
         },
         {
@@ -456,6 +478,9 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
     SetCoupledCartesianPosition(1,x_want,y_want);
     SetCoupledCartesianPosition(2,x_want,y_want);
     SetCoupledCartesianPosition(3,x_want,y_want);
+
+    usart_printf("%f,%f\n",AngleLoop[1].Out_put,AngleLoop[5].Out_put);
+
     osDelay(delaytime);
 }
 
@@ -463,8 +488,6 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 void SetPolarPositionAll_Delay(float polar_angle,float polar_diameter,uint16_t delaytime)
 {
     float x_want,y_want;
-
-    //usart_printf("%f,%f\n",AngleLoop[1].P,AngleLoop[1].D);
 
     if(polar_angle>=0)
     {
