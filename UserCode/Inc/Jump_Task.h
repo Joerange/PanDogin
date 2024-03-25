@@ -18,6 +18,8 @@ enum JumpTypes
     Test_Jump =     5,
 };
 
+extern uint8_t Jump_flag;
+
 void ExecuteJump(uint8_t JumpType,float JumpAngle);
 void StairJump(uint8_t stage);
 void SeesawJump(uint8_t stage);

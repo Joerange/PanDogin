@@ -82,30 +82,53 @@ void SetCoupledThetaPositionAll(void)
 
 void SetCoupledThetaPosition(int LegId)
 {
-    switch(LegId)
+    if(Jump_flag == 1)
     {
-        case 0:
-            AngleWant_MotorX[1]=-TargetAngle2 + offset_front_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-//            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 - Roll_PID_Loop.Out_put;//+10.0f
-//            AngleWant_MotorX[2]=-TargetAngle1 + offset_front_0 + Target_offset1;//+10.0f
-            break;
-        case 1:
-            AngleWant_MotorX[3]=-TargetAngle2 + offset_back_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//+5.0f
-            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-//            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 - Roll_PID_Loop.Out_put;
-//            AngleWant_MotorX[4]=-TargetAngle1 + offset_back_0 + Target_offset2;
-            break;
-        case 2:
-            AngleWant_MotorX[5]=TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//-4.0f
-            AngleWant_MotorX[6]=TargetAngle2 - offset_front_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-            break;
-        case 3:
-            AngleWant_MotorX[7]=TargetAngle1 - offset_back_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-            AngleWant_MotorX[8]=TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-            break;
-        default:
-            break;
+        switch(LegId) {
+            case 0:
+                AngleWant_MotorX[1] = -TargetAngle2 + offset_front_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                break;
+            case 1:
+                AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//+5.0f
+                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                break;
+            case 2:
+                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//-4.0f
+                AngleWant_MotorX[6] = TargetAngle2 - offset_front_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                break;
+            case 3:
+                AngleWant_MotorX[7] = TargetAngle1 - offset_back_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
+                break;
+            default:
+                break;
+        }
+    }
+    else if(Jump_flag == 0)
+    {
+        switch(LegId) {
+            case 0:
+                AngleWant_MotorX[1] = -TargetAngle2 + offset_front_1;
+//                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0;
+                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0 + Target_offset1;
+                break;
+            case 1:
+                AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1;//+5.0f
+//                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0;
+                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 + Target_offset2;
+                break;
+            case 2:
+                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0;//-4.0f
+                AngleWant_MotorX[6] = TargetAngle2 - offset_front_1;
+                break;
+            case 3:
+                AngleWant_MotorX[7] = TargetAngle1 - offset_back_0;
+                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1;
+                break;
+            default:
+                break;
+        }
     }
 
     //注意角度赋值根据不同的电机顺序和正负不同，同时也受机械结果安装的影响。若有改动，则这里的角度的对应关系也要变。
@@ -152,22 +175,6 @@ void CartesianToTheta(void)
     //最终确定电机角度。角度范围分别为0°~360°和-360°~0°。
     TargetAngle1=-(A1-90);
     TargetAngle2=-(A2-270);//
-    //
-
-//    if(IMU_Stand_flag == 1)
-//    {
-//        offset_front_0 = -AngleWant_MotorX[5] - 0;
-//        offset_front_1 = -AngleWant_MotorX[6] - PI;
-//        offset_back_0 = -AngleWant_MotorX[5] - 0;
-//        offset_back_1 = -AngleWant_MotorX[6] - PI;
-//    }
-//    else if(IMU_Stand_flag == 0)
-//    {
-//        offset_front_0 = 0.57f;
-//        offset_front_1 = 1.098685f;
-//        offset_back_0 = 0.57f;//(-121.9f)
-//        offset_back_1 = 1.098685f;//207.2f
-//    }
 
     if(reverse_move_flag == 1)//运动反向控制
     {
@@ -307,18 +314,23 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         },
         {
 
-            1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-            {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
-            {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
-            {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f},
-            {21.0f, 15.0f,  2.5f, 0.5f, 0.3f, 2.3f}
+//            1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
+//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
+//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
+//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f}
+                1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
+                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
+                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
+                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
+                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f}
         },
         {
             2,//原地踏步//出现多种步态基高差距过大是会失效
-            {18.5f, 0.0f,  0.8f, 10.0f, 0.3f, 3.0f},
-            {18.5f, 0.0f,  0.8f, 10.0f, 0.3f, 3.0f},
-            {18.5f, 0.0f,  0.8f, 10.0f, 0.3f, 3.0f},
-            {18.5f, 0.0f,  0.8f, 10.0f, 0.3f, 3.0f}
+            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
+            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
+            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
+            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f}
         },
         {
             3,//Walk步态（没有调好）
@@ -333,10 +345,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}*/
-                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
-                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
-                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f},
-                {16.0f, 10.0f,  2.0f, 0.5f, 0.3f, 1.6f}
+                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 1.2f},
+                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 1.2f},
+                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 1.2f},
+                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 1.2f}
 
         },
         {
@@ -357,75 +369,57 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction)
 {
     float normal_step_left = 0,normal_step_right = 0;
-    float f_left = 0,f_right = 0;
-    if(IMU_Control_Flag)
-    {
-        /*******IMUのPID相关*******/
-        //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度）
-        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
-        SetPoint_IMU(&Roll_PID_Loop,0);
-
-        PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
-        PID_PosLocM2006(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
-
-        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
-        /**********步态控制*********/
-        //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长增加
-        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put;//左腿步长增加
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put;//左腿步长增加
-        //步长限幅
-        if(normal_step_right > StepLenthMax)
-            normal_step_right = StepLenthMax;
-        else if(normal_step_right < StepLenthMin)
-            normal_step_right = StepLenthMin;
-
-        if(normal_step_left > StepLenthMax)
-            normal_step_left = StepLenthMax;
-        else if(normal_step_left < StepLenthMin)
-            normal_step_left = StepLenthMin;
-
-        if(f_right > freMAX)
-            f_right = freMAX;
-        else if(f_right < freMIN)
-            f_right = freMIN;
+//    if(IMU_Control_Flag)
+//    {
+//        /*******IMUのPID相关*******/
+//        //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度）
+//        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
+//        SetPoint_IMU(&Roll_PID_Loop,0);
 //
-        if(f_left > freMAX)
-            f_left = freMAX;
-        else if(f_left < freMIN)
-            f_left = freMIN;
-
-        //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
-        State_Detached_Params->detached_params_0.step_length = normal_step_left;
-        State_Detached_Params->detached_params_1.step_length = normal_step_left;
-
-        State_Detached_Params->detached_params_0.freq = f_left;
-        State_Detached_Params->detached_params_1.freq = f_left;
-
-        State_Detached_Params->detached_params_2.step_length = normal_step_right;
-        State_Detached_Params->detached_params_3.step_length = normal_step_right;
-
-        State_Detached_Params->detached_params_2.freq = f_right;
-        State_Detached_Params->detached_params_3.freq = f_right;
-    }
-    else if(visual_control_flag)
-    {
+//        PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
+//        PID_PosLocM2006(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
+//
+//        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
+//        /**********步态控制*********/
+//        //Yaw输出给步长参数
+//        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put;//左腿步长增加
+//        normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put;//右腿步长减小
+//        //步长限幅
+//        if(normal_step_right > StepLenthMax)
+//            normal_step_right = StepLenthMax;
+//        else if(normal_step_right < StepLenthMin)
+//            normal_step_right = StepLenthMin;
+//
+//        if(normal_step_left > StepLenthMax)
+//            normal_step_left = StepLenthMax;
+//        else if(normal_step_left < StepLenthMin)
+//            normal_step_left = StepLenthMin;
+//
+//        //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
+//        State_Detached_Params->detached_params_0.step_length = normal_step_left;
+//        State_Detached_Params->detached_params_1.step_length = normal_step_left;
+//
+//        State_Detached_Params->detached_params_2.step_length = normal_step_right;
+//        State_Detached_Params->detached_params_3.step_length = normal_step_right;
+//    }
+//    else if(visual_control_flag)
+//    {
         /*******IMUのPID相关*******/
         //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度）
-        SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
         SetPoint_Visual(&VisualLoop,MidPoint);
 
-        PID_PosLocM2006(&Yaw_PID_Loop,IMU_EulerAngle.EulerAngle[Yaw]);
         PID_PosLocM2006(&VisualLoop,visual.offset);
 
-        if(direction != 1) Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put; VisualLoop.Out_put = -VisualLoop.Out_put;
-        /**********步态控制*********/
+        if(direction != 1)
+        {
+//            VisualLoop.Out_put = -VisualLoop.Out_put;
+            /**********步态控制*********/
+            Yaw_PID_Loop.Out_put = -Yaw_PID_Loop.Out_put;
+        }
+
         //Yaw输出给步长参数
-        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length - Yaw_PID_Loop.Out_put - VisualLoop.Out_put ;//左腿步长增加
+        normal_step_left  = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length  - Yaw_PID_Loop.Out_put - VisualLoop.Out_put ;//左腿步长增加
         normal_step_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.step_length + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//右腿步长减小
-        f_left = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq - Yaw_PID_Loop.Out_put - VisualLoop.Out_put;//左腿步长增加
-        f_right = StateDetachedParams_Copy[State_Detached_Params->GaitID].detached_params_0.freq + Yaw_PID_Loop.Out_put + VisualLoop.Out_put;//左腿步长增加
         //步长限幅
         if(normal_step_right > StepLenthMax)
             normal_step_right = StepLenthMax;
@@ -437,29 +431,13 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
         else if(normal_step_left < StepLenthMin)
             normal_step_left = StepLenthMin;
 
-        if(f_right > freMAX)
-            f_right = freMAX;
-        else if(f_right < freMIN)
-            f_right = freMIN;
-//
-        if(f_left > freMAX)
-            f_left = freMAX;
-        else if(f_left < freMIN)
-            f_left = freMIN;
-
         //最终赋值（前面的步长限幅保证了步长参数总是在合理的范围内而不会疯掉，从根本上解决了出现IMU控制坏掉BUG的可能性）
         State_Detached_Params->detached_params_0.step_length = normal_step_left;
         State_Detached_Params->detached_params_1.step_length = normal_step_left;
 
-        State_Detached_Params->detached_params_0.freq = f_left;
-        State_Detached_Params->detached_params_1.freq = f_left;
-
         State_Detached_Params->detached_params_2.step_length = normal_step_right;
         State_Detached_Params->detached_params_3.step_length = normal_step_right;
-
-        State_Detached_Params->detached_params_2.freq = f_right;
-        State_Detached_Params->detached_params_3.freq = f_right;
-    }
+//    }
 }
 
 //直接设置所需x，y位置进行电机控制
@@ -469,6 +447,7 @@ void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
     y=y_want;
     CartesianToTheta();
     SetCoupledThetaPosition(LegId);
+
 }
 
 //所有腿的直角坐标控制
@@ -478,8 +457,6 @@ void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
     SetCoupledCartesianPosition(1,x_want,y_want);
     SetCoupledCartesianPosition(2,x_want,y_want);
     SetCoupledCartesianPosition(3,x_want,y_want);
-
-    usart_printf("%f,%f\n",AngleLoop[1].Out_put,AngleLoop[5].Out_put);
 
     osDelay(delaytime);
 }

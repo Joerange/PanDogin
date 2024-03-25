@@ -2,7 +2,7 @@
 // Created by 1 on 2023-11-07.
 //
 #include "Attitude_Task.h"
-
+uint8_t delay_flag = 0;
 float TargetAngle1 = 0,TargetAngle2 = 0;
 enum GPStates gpstate = STOP;
 enum DPStates dpstate = NONE;
@@ -16,7 +16,7 @@ uint8_t IMU_Stand_flag = 0;
 
 void StandUp_Posture(void)
 {
-    IMU_Stand_flag = 0;
+    Jump_flag = 0;
     ChangeGainOfPID(6.0f,0.2f,0.03f,0.05f);//³õÊ¼»¯pid
     AllLegsSpeedLimit(SpeedMode_VERYFAST);
     Get_Target(0,PI);
@@ -81,7 +81,7 @@ void Trot(float direction,int8_t kind)
             Target_offset2 = 0.112f;
             NewHeartbeat = 5;
             ChangeGainOfPID(18.5f,0.2f,0.6f,0);
-            ChangeYawOfPID(0.4f,0.01f,3000.0f,10.0f);
+            ChangeYawOfPID(0.1f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
                           direction,direction,direction,direction);
@@ -89,7 +89,7 @@ void Trot(float direction,int8_t kind)
         case 2://Ë«Ä¾ÇÅ
             AllLegsSpeedLimit(SpeedMode_EARLYEX);
             Target_offset2 = 0.112f;
-            NewHeartbeat = 4;
+            NewHeartbeat = 5;
             ChangeGainOfPID(15.5f,0.2f,0.6f,0);
             ChangeYawOfPID(0.35f,0.035f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[4], direction);
@@ -255,46 +255,51 @@ void FBwAaLitAir(void)
     gpstate = STOP;//»Øµ½Í£Ö¹Ì¬
     osDelay(2000);
 }
+
 void Race_Competition(void)
 {
     if(Race_count == 0 && Distance >= 115.0f)
         Trot(Forward,1);
     if(Distance < 115.0f && Race_count == 0)
     {
-        while (IMU_EulerAngle.EulerAngle[Yaw] > -42.0f)
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -43.0f)
         {
             Turn('r','f');
         }
+        TargetAngle = -151.5f;
         for (int i = 0; i < 5; ++i) {
             distance[i] = 300;
         }
         Distance = 300.0f;
-        visual.offset = 0;
-        TargetAngle = -149;
-        yawwant = -42.0f;
+        visual.offset = 100;
+        yawwant = -43.0f;
         Race_count++;
+        StandUp_Posture();
+        osDelay(500);
     }
-    if(Race_count == 1 && Distance >= 69.0f)
+    if(Race_count == 1 && Distance >= 70.0f)
     {
         Trot(Backward,1);
     }
-    if(Distance < 69.0f && Race_count == 1)
+    if(Distance < 70.0f && Race_count == 1)
     {
-        while (IMU_EulerAngle.EulerAngle[Yaw] > -89.5f)
+        while (IMU_EulerAngle.EulerAngle[Yaw] > -89.6f)
         {
             Turn('r','f');
         }
+        TargetAngle = 0;
         for (int i = 0; i < 5; ++i) {
             distance[i] = 300;
         }
         Distance = 300.0f;
-        visual.offset = 0;
-        TargetAngle = 0;
-        yawwant = -90.0f;
+        visual.offset = 100;
+        yawwant = -89.6f;
         Race_count++;
+        StandUp_Posture();
+        osDelay(500);
     }
-    if(Race_count == 2 && Distance >= 50.0f)
+    if(Race_count == 2 && Distance >= 105.0f)
         Trot(Forward,1);
-    if(Race_count == 2 && Distance < 50.0f)
+    if(Race_count == 2 && Distance < 105.0f)
         StandUp_Posture();
 }

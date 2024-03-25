@@ -23,9 +23,9 @@ void visual_process(void)
 
         Distance = (distance[0] + distance[1] + distance[2] + distance[3] + distance[4]) / 5;
 
-        if(visual.distance < -3000)
+        if(visual.distance < -3000 || visual.distance > 3000)
             visual.distance = 200;
-        if(visual.offset < -300)
-            visual.offset = 0;
+        if(visual.offset < -300 || visual.offset > 300)
+            visual.offset = 100;
     }
 }

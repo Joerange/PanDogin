@@ -24,12 +24,12 @@
 //腿长限位
 #define LegLenthExtremeMax 32.0f //
 #define LegLenthMax 30.0f //
-#define LegLenthMin 12.0f //
+#define LegLenthMin 11.5f //
 #define LegStandLenth 16.0f //
 #define LegSquatLenth 12.0f //
 //腿长限位
 #define StepLenthMin 8.5f
-#define StepLenthMax 25.5f //大小大概在45cm
+#define StepLenthMax 20.0f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
 #define StatesMaxNum 20
@@ -37,7 +37,7 @@
 #define LengthChange_Kp 5.0f
 #define freChange_Kp 1.67f
 
-#define freMAX 9.0f
+#define freMAX 4.0f
 #define freMIN 1.0f
 
 #define MidPoint 100
