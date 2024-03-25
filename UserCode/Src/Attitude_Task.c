@@ -126,7 +126,7 @@ void Turn(int state_flag,int speed_flag)
     }
     else if(speed_flag == 's')
     {
-        length = 7.0f;
+        length = 5.0f;
         state_detached_params[0].detached_params_0.freq = 2.0f;
         state_detached_params[0].detached_params_1.freq = 2.0f;
         state_detached_params[0].detached_params_2.freq = 2.0f;
@@ -135,7 +135,7 @@ void Turn(int state_flag,int speed_flag)
 
     NewHeartbeat = 5;
     AllLegsSpeedLimit(SpeedMode_EXTREME);
-    ChangeGainOfPID(10.0f,0.2f,0.6f,0);
+    ChangeGainOfPID(17.0f,0.2f,0.6f,0);
     switch (state_flag) {
         case 'l':
             state_detached_params[0].detached_params_0.step_length = -length;

@@ -156,7 +156,7 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(0,1);
+    Control_Flag(0,0);
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -190,8 +190,8 @@ void BlueTeeth_RemoteControl(void const * argument)
   for(;;)
   {
       Remote_Controller();
-      usart_printf("%f,%f,%f,%f,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],visual.offset,state_detached_params[1].detached_params_0.step_length,
-                   state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq);
+//      usart_printf("%f,%f,%f,%f,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],visual.offset,state_detached_params[1].detached_params_0.step_length,
+//                   state_detached_params[1].detached_params_0.freq,state_detached_params[1].detached_params_2.step_length,state_detached_params[1].detached_params_2.freq);
 //      usart_printf("%f,%f\n",visual.distance,visual.offset);
 //      usart_printf("%f,%f,%f.%f\n", AngleLoop[1].Out_put,AngleLoop[2].Out_put,AngleLoop[3].Out_put,AngleLoop[4].Out_put);
 //      usart_printf("%f,%f,%d,%f,%f,%d,%f,%f\n",IMU_EulerAngle.EulerAngle[Yaw],Yaw_PID_Loop.Out_put,Race_count,visual.distance,visual.offset,gpstate,x,y);
@@ -220,14 +220,14 @@ void GO1Init(void const * argument)
     EndPosture();                //锁住电机
 
     visual.offset = 100;
-    TargetAngle = -151.0f;
+//    TargetAngle = -151.0f;
 
     PID_Init(&Yaw_PID_Loop);
     ChangeYawOfPID(0.03f,0.02f,4000.0f,15.0f);//陀螺仪PID初始化
 
     PID_Init(&Roll_PID_Loop);
-    Roll_PID_Loop.P = 0.1f;
-    Roll_PID_Loop.D = 0.01f;
+    Roll_PID_Loop.P = 0.2f;
+    Roll_PID_Loop.D = 0.02f;
     Roll_PID_Loop.SumError = 4000.0f;
     Roll_PID_Loop.Output_limit = 15.0f;
 
@@ -289,10 +289,9 @@ void VisualTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-        visual_process();
-//      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
-//              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
-////      usart_printf("%d\n",Jump_flag);
+//        visual_process();
+      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
+              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
 //      if(visual.data_8[1] == 1 && gpstate != 0 && gpstate != 3 && gpstate != 1)
 //          MarkingTime();
 
@@ -340,6 +339,8 @@ void TripodHeadTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+      SetPoint_IMU(&Roll_PID_Loop,0);
+      PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
 
       SetPoint_IMU(&M2006_Position, AngleChange(TargetAngle));
       PID_PosLocM2006(&M2006_Position,struct_debug1[0].total_angle);

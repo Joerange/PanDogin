@@ -74,16 +74,16 @@ void Remote_Controller(void)
             Turn('r','s');
             break;
         case 10:
-            Trot(Forward,1);
+            Trot(Forward,2);
             break;
         case 11:
-            Trot(Backward,1);
+            Trot(Backward,2);
             break;
         case 20:
             ExecuteJump(Standard_Jump,60);
             break;
         case 21:
-            ExecuteJump(High_Jump,88);
+            ExecuteJump(High_Jump,75);
             break;
         case 22:
             ExecuteJump(Far_Jump,70);
