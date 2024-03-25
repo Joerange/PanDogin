@@ -119,10 +119,10 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
     else if(JumpType == High_Jump)//简单原地跳个高（任何地面都行）
     {
         /*跳跃过程的时间把控（以实测为主设置何时的时间，保证运动过程分段的合理性）*/
-        const uint16_t prep_time = 800;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
-        const uint16_t launch_time = 250;    //伸展腿的持续时间                  [s]  0.2
-        const uint16_t fall_time = 100;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
-        const uint16_t strech_time = 250;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
+        const uint16_t prep_time = 1000;       //准备时间，即收缩退准备起跳的时间  [s]  0.4
+        const uint16_t launch_time = 200;    //伸展腿的持续时间                  [s]  0.2
+        const uint16_t fall_time = 180;      //在空中飞翔的时间                 [s]  0.25（这个时间最好设置的小点）
+        const uint16_t strech_time = 350;  //落地并用力支撑的时间              [s]  0.3（这个时间结束后就会立刻进入站立态了）
         /*跳跃的姿态把控（调节时，可按0.1的整数倍进行加减调整，如（LegSquatLenth-0.4））*/
         const float stance_height = LegLenthMin;  //跳跃之前腿的高度  [cm]，理论上应等于LegSquatLenth 11.2f，这里测试跳跃时可以使用LegLenthMin 10.7f
         const float jump_extension = LegLenthMax; //伸展跳跃的最大伸腿长度      [cm]，理论上应等于LegLenthMax 28
@@ -130,19 +130,23 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         const float jump_landlegheight = LegStandLenth; //落地时腿长度  [cm]，理论上应等于LegStandLenth 18.0f
         //下蹲，准备起跳，持续时间为prep_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
-        ChangeGainOfPID(8.0f,0.2f,0,0);//使用刚度小，阻尼大的增益
-        SetPolarPositionAll_Delay(JumpAngle + 2,stance_height,prep_time);
+        ChangeGainOfPID(2.0f,2.2f,0,0);//使用刚度小，阻尼大的增益
+        SetPolarPositionAll_Delay(-JumpAngle - 2,stance_height,prep_time);
         //芜湖起飞（核心），持续时间为launch_time
-        AllLegsSpeedLimit(30.0f);//速度拉满
-        ChangeGainOfPID(32.0f,0.321f,0,0);// 使用高刚度和低阻尼执行跳转
-        SetPolarPositionAll_Delay(JumpAngle,jump_extension,launch_time);
+        AllLegsSpeedLimit(35.0f);//速度拉满
+        //ChangeGainOfPID(32.0f,0.321f,0,0);// 使用高刚度和低阻尼执行跳转
+        LegPID_Set(1,32.0f,0.321f);
+        LegPID_Set(2,32.0f,0.321f);
+        LegPID_Set(3,28.0f,0.321f);
+        LegPID_Set(4,30.0f,0.321f);
+        SetPolarPositionAll_Delay(-JumpAngle,jump_extension,launch_time);
         //飞翔过程（也即降落过程）中的姿态（核心），持续时间为fall_time
         AllLegsSpeedLimit(SpeedMode_VERYFAST);
-        ChangeGainOfPID(5.0f,0.5f,0,0);//使用低刚度和大量的阻尼来处理下降
-        SetPolarPositionAll_Delay(-40,jump_flylegheight,fall_time);
+        ChangeGainOfPID(40.0f,0.5f,0,0);//使用低刚度和大量的阻尼来处理下降
+        SetPolarPositionAll_Delay(70,jump_flylegheight,fall_time);
         //脚用力准备站起来
-        ChangeGainOfPID(6,0.1,0.0f,0.0f);//使用低刚度和大量的阻尼来处理下降
-        SetPolarPositionAll_Delay(-88,jump_landlegheight,strech_time);
+        ChangeGainOfPID(0.3,2.1,0.0f,0.0f);//使用低刚度和大量的阻尼来处理下降
+        SetPolarPositionAll_Delay(82,jump_landlegheight + 1,strech_time);
         Jump_flag = 1;
         //差不多站好了，执行完毕
         gpstate = HALT;
@@ -206,8 +210,8 @@ void ExecuteJump(uint8_t JumpType,float JumpAngle)
         SetPolarPositionFB_Delay(Leg_Front,-70,LegStandLenth,fall_time/2);
         //脚用力准备站起来
         AllLegsSpeedLimit(SpeedMode_EXTREME);
-        FBLegsPID_Set(Leg_Front,6,0.1f,0.08f,35,1.1f);
-        FBLegsPID_Set(Leg_Back,6,0.1f,0.1f,130,1.1f);
+        FBLegsPID_Set(Leg_Front,6,0.1f);
+        FBLegsPID_Set(Leg_Back,6,0.1f);
         SetPolarPositionFB_Delay(Leg_Front,-70,jump_landlegheight,0);
         SetCartesianPositionFB_Delay(Leg_Back,0.2f,LegSquatLenth,strech_time);
         //差不多站好了，执行完毕
@@ -384,8 +388,8 @@ void SeesawJump(uint8_t stage)
         osDelay(fall_time);
         //脚用力准备站起来
         AllLegsSpeedLimit(SpeedMode_EXTREME);
-        FBLegsPID_Set(Leg_Front,6,0.1f,0.08f,35,1.1f);
-        FBLegsPID_Set(Leg_Back,6,0.1f,0.1f,130,1.1f);
+        FBLegsPID_Set(Leg_Front,6,0.1f);
+        FBLegsPID_Set(Leg_Back,6,0.1f);
         SetPolarPositionAll_Delay(70,jump_landlegheight,strech_time);
         //差不多站好了，执行完毕
         gpstate = HALT;
@@ -420,8 +424,8 @@ void SeesawJump(uint8_t stage)
         osDelay(fall_time);
         //脚用力准备站起来
         AllLegsSpeedLimit(SpeedMode_EXTREME);
-        FBLegsPID_Set(Leg_Front,6,0.1f,0.08f,35,1.1f);
-        FBLegsPID_Set(Leg_Back,6,0.1f,0.1f,130,1.1f);
+        FBLegsPID_Set(Leg_Front,6,0.1f);
+        FBLegsPID_Set(Leg_Back,6,0.1f);
         SetPolarPositionAll_Delay(70,jump_landlegheight,strech_time);
         //差不多站好了，执行完毕
         gpstate = HALT;
@@ -493,8 +497,8 @@ void Bridge_Jump(uint8_t stage)
             //脚用力准备站起来
             AllLegsSpeedLimit(SpeedMode_FAST);
             ChangeGainOfPID(8,0.1f,0.0f,0);//使用低刚度和大量的阻尼来处理下降
-            FBLegsPID_Set(Leg_Front,6,0.1f,0.08f,35,1.1f);
-            FBLegsPID_Set(Leg_Back,6,0.1f,0.1f,130,1.1f);
+            FBLegsPID_Set(Leg_Front,6,0.1f);
+            FBLegsPID_Set(Leg_Back,6,0.1f);
             SetPolarPositionAll_Delay(-62,jump_landlegheight,strech_time);
             //差不多站好了，执行完毕
             gpstate = HALT_IMU;
@@ -529,8 +533,8 @@ void Bridge_Jump(uint8_t stage)
             SetPolarPositionAll_Delay(-25,jump_flylegheight,fall_time);
             //脚用力落地
             AllLegsSpeedLimit(SpeedMode_FAST);
-            FBLegsPID_Set(Leg_Back,5,0.1f,0.20f,20,2.0f);
-            FBLegsPID_Set(Leg_Back,5,0.1f,0.20f,20,2.0f);
+            FBLegsPID_Set(Leg_Back,5,0.1f);
+            FBLegsPID_Set(Leg_Back,5,0.1f);
             SetPolarPositionAll_Delay(-70,jump_landlegheight,strech_time);
             //站起来
             ChangeAllGainOfPID(5,0.1f,0.55f,25,2.0f);//站立态PID
@@ -583,12 +587,12 @@ void FrontFlipJump(uint8_t mode)
         /***********************************************************/
         /*后腿起跳，前腿立刻变化一段（这种情况下，若前腿变化合适，理论上转动的支点不再是足端，而应当看成是髋关节），持续时间为launch_time*/
         AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);//速度拉满
-        LegPID_Set(1,8,0.1f,5.5f,255,0.1f);LegPID_Set(3,8,0.1f,5.5f,255,0.1f);//使用高刚度和低阻尼执行跳转
+        LegPID_Set(1,8,0.1f);LegPID_Set(3,8,0.1f);//使用高刚度和低阻尼执行跳转
         /*********后腿起跳**********/
         SetPolarPositionFB_Delay(Leg_Back,backleg_jump_angle,jump_extension,0);
         /*********前腿立刻再向前一点**********/
-        LegPID_Set(0,5,0.1f,0.7f,25,2.0f);//ChangeAllGainOfPID(5,0.1,0.7,25,2.0);//站立态PID
-        LegPID_Set(2,5,0.1f,0.7f,25,2.0f);
+        LegPID_Set(0,5,0.1f);//ChangeAllGainOfPID(5,0.1,0.7,25,2.0);//站立态PID
+        LegPID_Set(2,5,0.1f);
         LegSpeedLimit(0,4000);
         LegSpeedLimit(2,4000);
         SetPolarPositionFB_Delay(Leg_Front,frontleg_squat_angle+delta_angle,stance_height,0);
@@ -600,8 +604,8 @@ void FrontFlipJump(uint8_t mode)
             timedelay++;
             if(timedelay == backleg_jump_time/5) //非阻塞延时，约5ms一次。
             {
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿慢慢倒立态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_SLOW + 150);
                 LegSpeedLimit(3,SpeedMode_SLOW + 150);
@@ -612,8 +616,8 @@ void FrontFlipJump(uint8_t mode)
                 SetCoupledThetaPosition(3);
             }
             /***********前腿慢慢水平************/
-            LegPID_Set(0,7.5f,0.1f,0.8f,180,0.1f);
-            LegPID_Set(2,7.5f,0.1f,0.8f,180,0.1f);
+            LegPID_Set(0,7.5f,0.1f);
+            LegPID_Set(2,7.5f,0.1f);
             LegSpeedLimit(0,1000);
             LegSpeedLimit(2,1000);
             SetCartesianPositionFB_Delay(Leg_Front,LegSquatLenth,-0.15f,0);
@@ -630,7 +634,7 @@ void FrontFlipJump(uint8_t mode)
             {
                 imu_wait_lock=0;
                 //避免过快翻转导致后腿没来得及卧倒，故这里强制再进行一次卧倒。
-                FBLegsPID_Set(Leg_Back,6,0.1f,0.04f,35,0.1f);
+                FBLegsPID_Set(Leg_Back,6,0.1f);
                 FBLegsSpeedLimit(Leg_Back,SpeedMode_SLOW + 150);
                 //后腿反向转
                 TargetAngle1=-180;TargetAngle2=360;
@@ -907,8 +911,8 @@ void FrontFlipJump(uint8_t mode)
         //速度拉满
         AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);
         //使用高刚度和低阻尼执行跳转
-        LegPID_Set(1,8,0.1f,5.5f,255,0.1f);
-        LegPID_Set(3,8,0.1f,5.5f,255,0.1f);
+        LegPID_Set(1,8,0.1f);
+        LegPID_Set(3,8,0.1f);
         /*********后腿起跳**********/
         x = -jump_extension*cos(backleg_jump_angle*PI/180);
         y =  jump_extension*sin(backleg_jump_angle*PI/180);
@@ -919,8 +923,8 @@ void FrontFlipJump(uint8_t mode)
         x =  -stance_height*cos((frontleg_squat_angle+delta_angle)*PI/180);
         y =   stance_height*sin((frontleg_squat_angle+delta_angle)*PI/180);
         CartesianToTheta();
-        LegPID_Set(0,7,0.1f,1.5f,222,0.1f);
-        LegPID_Set(2,7,0.1f,1.5f,222,0.1f);
+        LegPID_Set(0,7,0.1f);
+        LegPID_Set(2,7,0.1f);
         LegSpeedLimit(0,3000);
         LegSpeedLimit(2,3000);
         SetCoupledThetaPosition(0);
@@ -933,8 +937,8 @@ void FrontFlipJump(uint8_t mode)
             timedelay++;
             if(timedelay == backleg_jump_time/5) //非阻塞延时，约5ms一次。
             {
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿慢慢倒立态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_SLOW + 150);
                 LegSpeedLimit(3,SpeedMode_SLOW + 150);
@@ -945,8 +949,8 @@ void FrontFlipJump(uint8_t mode)
                 SetCoupledThetaPosition(3);
             }
             /***********前腿慢慢水平************/
-            LegPID_Set(0,7.5f,0.1f,1.1f,200,0.1f);
-            LegPID_Set(2,7.5f,0.1f,1.1f,200,0.1f);
+            LegPID_Set(0,7.5f,0.1f);
+            LegPID_Set(2,7.5f,0.1f);
             LegSpeedLimit(0,1000);
             LegSpeedLimit(2,1000);
             y=-0.15f;
@@ -967,8 +971,8 @@ void FrontFlipJump(uint8_t mode)
             {
                 imu_wait_lock=0;
                 //避免过快翻转导致后腿没来得及卧倒，故这里强制再进行一次卧倒。
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿慢慢倒立态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_SLOW + 150);
                 LegSpeedLimit(3,SpeedMode_SLOW + 150);
@@ -1065,8 +1069,8 @@ void FrontFlipJump(uint8_t mode)
             x = -stance_height*cos(88*PI/180);
             y =  stance_height*sin(88*PI/180);
             CartesianToTheta();
-            LegPID_Set(0,7,0.1f,1.5f,222,0.1f);
-            LegPID_Set(2,7,0.1f,1.5f,222,0.1f);
+            LegPID_Set(0,7,0.1f);
+            LegPID_Set(2,7,0.1f);
             LegSpeedLimit(0,SpeedMode_EXTREME);
             LegSpeedLimit(2,SpeedMode_EXTREME);
             SetCoupledThetaPosition(0);
@@ -1187,8 +1191,8 @@ void FrontFlipJump(uint8_t mode)
             x = -stance_height*cos(88*PI/180);
             y =  stance_height*sin(88*PI/180);
             CartesianToTheta();
-            LegPID_Set(0,7,0.1f,1.5f,222,0.1f);
-            LegPID_Set(2,7,0.1f,1.5f,222,0.1f);
+            LegPID_Set(0,7,0.1f);
+            LegPID_Set(2,7,0.1f);
             LegSpeedLimit(0,SpeedMode_EXTREME);
             LegSpeedLimit(2,SpeedMode_EXTREME);
             SetCoupledThetaPosition(0);
@@ -1286,8 +1290,8 @@ void FrontFlipJump(uint8_t mode)
         //速度拉满
         AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);
         //使用高刚度和低阻尼执行跳转
-        LegPID_Set(1,8,0.1f,5.5f,255,0.1f);
-        LegPID_Set(3,8,0.1f,5.5f,255,0.1f);
+        LegPID_Set(1,8,0.1f);
+        LegPID_Set(3,8,0.1f);
         /*********后腿起跳**********/
         x = -jump_extension*cos(backleg_jump_angle*PI/180);
         y =  jump_extension*sin(backleg_jump_angle*PI/180);
@@ -1298,8 +1302,8 @@ void FrontFlipJump(uint8_t mode)
         x =  -stance_height*cos((frontleg_squat_angle+delta_angle)*PI/180);
         y =   stance_height*sin((frontleg_squat_angle+delta_angle)*PI/180);
         CartesianToTheta();
-        LegPID_Set(0,7,0.1f,1.5f,222,0.1f);
-        LegPID_Set(2,7,0.1f,1.5f,222,0.1f);
+        LegPID_Set(0,7,0.1f);
+        LegPID_Set(2,7,0.1f);
         LegSpeedLimit(0,3000);
         LegSpeedLimit(2,3000);
         SetCoupledThetaPosition(0);
@@ -1312,8 +1316,8 @@ void FrontFlipJump(uint8_t mode)
             timedelay++;
             if(timedelay == 40) //非阻塞延时，约5ms一次。
             {
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿迅速卧倒态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_EXTREME);
                 LegSpeedLimit(3,SpeedMode_EXTREME);
@@ -1322,8 +1326,8 @@ void FrontFlipJump(uint8_t mode)
                 SetCoupledThetaPosition(3);
             }
             /***********前腿慢慢水平************/
-            LegPID_Set(0,7.5f,0.1f,1.1f,200,0.1f);
-            LegPID_Set(2,7.5f,0.1f,1.1f,200,0.1f);
+            LegPID_Set(0,7.5f,0.1f);
+            LegPID_Set(2,7.5f,0.1f);
             LegSpeedLimit(0,1000);
             LegSpeedLimit(2,1000);
             y=-0.15f;
@@ -1344,8 +1348,8 @@ void FrontFlipJump(uint8_t mode)
             {
                 imu_wait_lock=0;
                 //避免过快翻转导致后退不复位，这里强制再复一下位。
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿迅速卧倒态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_EXTREME);
                 LegSpeedLimit(3,SpeedMode_EXTREME);
@@ -1428,8 +1432,8 @@ void FrontFlipJump(uint8_t mode)
         //速度拉满
         AllLegsSpeedLimit(SpeedMode_JUMPPEDAL);
         //使用高刚度和低阻尼执行跳转
-        LegPID_Set(1,8,0.1f,5.5f,255,0.1f);
-        LegPID_Set(3,8,0.1f,5.5f,255,0.1f);
+        LegPID_Set(1,8,0.1f);
+        LegPID_Set(3,8,0.1f);
         /*********后腿起跳**********/
         x = -jump_extension*cos(backleg_jump_angle*PI/180);
         y =  jump_extension*sin(backleg_jump_angle*PI/180);
@@ -1440,8 +1444,8 @@ void FrontFlipJump(uint8_t mode)
         x =  -stance_height*cos((frontleg_squat_angle+delta_angle)*PI/180);
         y =   stance_height*sin((frontleg_squat_angle+delta_angle)*PI/180);
         CartesianToTheta();
-        LegPID_Set(0,7,0.1f,1.5f,222,0.1f);
-        LegPID_Set(2,7,0.1f,1.5f,222,0.1f);
+        LegPID_Set(0,7,0.1f);
+        LegPID_Set(2,7,0.1f);
         LegSpeedLimit(0,3000);
         LegSpeedLimit(2,3000);
         SetCoupledThetaPosition(0);
@@ -1454,8 +1458,8 @@ void FrontFlipJump(uint8_t mode)
             timedelay++;
             if(timedelay == backleg_jump_time/5) //非阻塞延时，约5ms一次。
             {
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿迅速卧倒态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_EXTREME);
                 LegSpeedLimit(3,SpeedMode_EXTREME);
@@ -1464,8 +1468,8 @@ void FrontFlipJump(uint8_t mode)
                 SetCoupledThetaPosition(3);
             }
             /***********前腿慢慢水平************/
-            LegPID_Set(0,7.5f,0.1f,1.1f,200,0.1f);
-            LegPID_Set(2,7.5f,0.1f,1.1f,200,0.1f);
+            LegPID_Set(0,7.5f,0.1f);
+            LegPID_Set(2,7.5f,0.1f);
             LegSpeedLimit(0,1000);
             LegSpeedLimit(2,1000);
             y=-0.15f;
@@ -1486,8 +1490,8 @@ void FrontFlipJump(uint8_t mode)
             {
                 imu_wait_lock=0;
                 //避免过快翻转导致后退不复位，这里强制再复一下位。
-                LegPID_Set(1,7,0.1f,1.1f,200,0.1f);
-                LegPID_Set(3,7,0.1f,1.1f,200,0.1f);
+                LegPID_Set(1,7,0.1f);
+                LegPID_Set(3,7,0.1f);
                 /******后腿迅速卧倒态（必要，否则会卡住）******/
                 LegSpeedLimit(1,SpeedMode_EXTREME);
                 LegSpeedLimit(3,SpeedMode_EXTREME);
@@ -1516,8 +1520,8 @@ void FrontFlipJump(uint8_t mode)
         AllLegsSpeedLimit(SpeedMode_EXTREME);
         //使用刚度小，阻尼大的增益
         ChangeAllGainOfPID(8.0f,0.1f,0.25f,100,0.1f);
-        TargetAngle2=-180-(-32.9);
-        TargetAngle1=0+(154.3);
+        TargetAngle2=-180.0f-(-32.9f);
+        TargetAngle1=0.0f+(154.3f);
         SetCoupledThetaPosition(0);
         SetCoupledThetaPosition(2);
         osDelay(100);

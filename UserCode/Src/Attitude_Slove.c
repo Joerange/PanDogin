@@ -91,7 +91,7 @@ void SetCoupledThetaPosition(int LegId)
                 break;
             case 1:
                 AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//+5.0f
-                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI + Roll_PID_Loop.Out_put;
+                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI /*+ Roll_PID_Loop.Out_put*/;
                 break;
             case 2:
                 AngleWant_MotorX[5] = TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//-4.0f
@@ -99,7 +99,7 @@ void SetCoupledThetaPosition(int LegId)
                 break;
             case 3:
                 AngleWant_MotorX[7] = TargetAngle1 - offset_back_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI + Roll_PID_Loop.Out_put;
+                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI /*+ Roll_PID_Loop.Out_put*/;
                 break;
             default:
                 break;
@@ -450,9 +450,9 @@ void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
 //所有腿的直角坐标控制
 void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 {
-    SetCoupledCartesianPosition(0,x_want,y_want);
+    SetCoupledCartesianPosition(0,x_want,y_want-0.5);
     SetCoupledCartesianPosition(1,x_want,y_want);
-    SetCoupledCartesianPosition(2,x_want,y_want);
+    SetCoupledCartesianPosition(2,x_want,y_want-1.2);
     SetCoupledCartesianPosition(3,x_want,y_want);
 
     osDelay(delaytime);

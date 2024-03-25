@@ -339,8 +339,8 @@ void TripodHeadTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-      SetPoint_IMU(&Roll_PID_Loop,0);
-      PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
+      // SetPoint_IMU(&Roll_PID_Loop,0);
+      // PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
 
       SetPoint_IMU(&M2006_Position, AngleChange(TargetAngle));
       PID_PosLocM2006(&M2006_Position,struct_debug1[0].total_angle);
