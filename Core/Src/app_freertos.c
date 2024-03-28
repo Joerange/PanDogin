@@ -50,10 +50,11 @@
 osThreadId StartTaskHandle;
 osThreadId BlueteethTaskHandle;
 osThreadId GO1Init_TaskHandle;
-osThreadId GO1_OutputHandle;
 osThreadId VisualHandle;
 osThreadId NRFTaskHandle;
 osThreadId TripodHeadHandle;
+osThreadId GO_OutputLeftHandle;
+osThreadId GO_OutputrightHandle;
 osMessageQId VisialHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -64,10 +65,11 @@ osMessageQId VisialHandle;
 void StartDebug(void const * argument);
 void BlueTeeth_RemoteControl(void const * argument);
 void GO1Init(void const * argument);
-void GO1_outTask(void const * argument);
 void VisualTask(void const * argument);
 void NRF(void const * argument);
 void TripodHeadTask(void const * argument);
+void GO_OutputLeftTask(void const * argument);
+void GO_OutputrightTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -108,16 +110,12 @@ void MX_FREERTOS_Init(void) {
   StartTaskHandle = osThreadCreate(osThread(StartTask), NULL);
 
   /* definition and creation of BlueteethTask */
-  osThreadDef(BlueteethTask, BlueTeeth_RemoteControl, osPriorityAboveNormal, 0, 512);
+  osThreadDef(BlueteethTask, BlueTeeth_RemoteControl, osPriorityAboveNormal, 0, 256);
   BlueteethTaskHandle = osThreadCreate(osThread(BlueteethTask), NULL);
 
   /* definition and creation of GO1Init_Task */
   osThreadDef(GO1Init_Task, GO1Init, osPriorityLow, 0, 128);
   GO1Init_TaskHandle = osThreadCreate(osThread(GO1Init_Task), NULL);
-
-  /* definition and creation of GO1_Output */
-  osThreadDef(GO1_Output, GO1_outTask, osPriorityAboveNormal, 0, 512);
-  GO1_OutputHandle = osThreadCreate(osThread(GO1_Output), NULL);
 
   /* definition and creation of Visual */
   osThreadDef(Visual, VisualTask, osPriorityHigh, 0, 256);
@@ -131,13 +129,22 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(TripodHead, TripodHeadTask, osPriorityNormal, 0, 256);
   TripodHeadHandle = osThreadCreate(osThread(TripodHead), NULL);
 
+  /* definition and creation of GO_OutputLeft */
+  osThreadDef(GO_OutputLeft, GO_OutputLeftTask, osPriorityHigh, 0, 256);
+  GO_OutputLeftHandle = osThreadCreate(osThread(GO_OutputLeft), NULL);
+
+  /* definition and creation of GO_Outputright */
+  osThreadDef(GO_Outputright, GO_OutputrightTask, osPriorityHigh, 0, 256);
+  GO_OutputrightHandle = osThreadCreate(osThread(GO_Outputright), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
     vTaskResume(StartTaskHandle);
     vTaskSuspend(TripodHeadHandle);
     vTaskSuspend(GO1Init_TaskHandle);
     vTaskSuspend(BlueteethTaskHandle);
-    vTaskSuspend(GO1_OutputHandle);
+    vTaskSuspend(GO_OutputLeftHandle);
+    vTaskSuspend(GO_OutputrightHandle);
     vTaskSuspend(VisualHandle);
     vTaskSuspend(NRFTaskHandle);
   /* USER CODE END RTOS_THREADS */
@@ -156,7 +163,9 @@ void StartDebug(void const * argument)
   /* USER CODE BEGIN StartDebug */
     Myinit();
     RemoteControl_Init(1,0); //选择要使用的远程控制模式
-    Control_Flag(0,0);
+    Control_Flag(0,0);//选择是否开启陀螺仪与视觉纠偏开关
+    IMU_Slove(1);//是否开启障碍时腿时刻保持竖直
+
     printf("Init_Ready\n");
     osDelay(3);
 
@@ -240,7 +249,8 @@ void GO1Init(void const * argument)
     printf("GO1 Init Ready\n");
     osDelay(3);
 
-    vTaskResume(GO1_OutputHandle);
+    vTaskResume(GO_OutputLeftHandle);
+//    vTaskResume(GO_OutputrightHandle);
     vTaskResume(BlueteethTaskHandle);
 //    vTaskResume(NRFTaskHandle);
     vTaskResume(VisualHandle);
@@ -252,27 +262,6 @@ void GO1Init(void const * argument)
     osDelay(1);
   }
   /* USER CODE END GO1Init */
-}
-
-/* USER CODE BEGIN Header_GO1_outTask */
-/**
-* @brief Function implementing the GO1_Output thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_GO1_outTask */
-void GO1_outTask(void const * argument)
-{
-  /* USER CODE BEGIN GO1_outTask */
-  /* Infinite loop */
-  for(;;)
-  {
-      leg_pos_controll();
-      leg_pos_controll02(); //作为将信号输出到GO1电机的函数
-
-    osDelay(3);
-  }
-  /* USER CODE END GO1_outTask */
 }
 
 /* USER CODE BEGIN Header_VisualTask */
@@ -289,9 +278,9 @@ void VisualTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-//        visual_process();
-      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
-              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
+        visual_process();
+//      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
+//              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
 //      if(visual.data_8[1] == 1 && gpstate != 0 && gpstate != 3 && gpstate != 1)
 //          MarkingTime();
 
@@ -353,6 +342,45 @@ void TripodHeadTask(void const * argument)
     osDelay(5);
   }
   /* USER CODE END TripodHeadTask */
+}
+
+/* USER CODE BEGIN Header_GO_OutputLeftTask */
+/**
+* @brief Function implementing the GO_OutputLeft thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_GO_OutputLeftTask */
+void GO_OutputLeftTask(void const * argument)
+{
+  /* USER CODE BEGIN GO_OutputLeftTask */
+  /* Infinite loop */
+  for(;;)
+  {
+      leg_pos_controll();
+      leg_pos_controll02();
+     osDelay(1);
+  }
+  /* USER CODE END GO_OutputLeftTask */
+}
+
+/* USER CODE BEGIN Header_GO_OutputrightTask */
+/**
+* @brief Function implementing the GO_Outputright thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_GO_OutputrightTask */
+void GO_OutputrightTask(void const * argument)
+{
+  /* USER CODE BEGIN GO_OutputrightTask */
+  /* Infinite loop */
+  for(;;)
+  {
+      leg_pos_controll();
+    osDelay(3);
+  }
+  /* USER CODE END GO_OutputrightTask */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -24,7 +24,7 @@
 //腿长限位
 #define LegLenthExtremeMax 32.0f //
 #define LegLenthMax 30.0f //
-#define LegLenthMin 11.5f //
+#define LegLenthMin 12.0f //
 #define LegStandLenth 16.0f //
 #define LegSquatLenth 12.0f //
 //腿长限位
@@ -94,5 +94,6 @@ void ReverseMoveOpen(void);
 void ReverseMoveClose(void);
 void SetCartesianPositionFB_Delay(int Leg_FB,float x_want,float y_want,uint16_t delaytime);
 void SetPolarPositionFB_Delay(uint8_t Legs_FB, float polar_angle,float polar_diameter,uint16_t delaytime);
+void IMU_Slove(uint8_t flag);
 
 #endif //MY_SCUDOG_ATTITUDE_SLOVE_H

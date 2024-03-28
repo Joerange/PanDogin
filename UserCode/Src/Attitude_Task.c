@@ -16,7 +16,6 @@ uint8_t IMU_Stand_flag = 0;
 
 void StandUp_Posture(void)
 {
-    Jump_flag = 0;
     ChangeGainOfPID(6.0f,0.2f,0.03f,0.05f);//初始化pid
     AllLegsSpeedLimit(SpeedMode_VERYFAST);
     Get_Target(0,PI);
@@ -68,7 +67,6 @@ void Trot(float direction,int8_t kind)
     {
         case 0://小步Trot
             AllLegsSpeedLimit(SpeedMode_EXTREME);
-            Target_offset2 = 0.112f;
             NewHeartbeat = 6;
             ChangeGainOfPID(12.0f,0.2f,0.6f,0);
             ChangeYawOfPID(200.0f,2.0f,3000.0f,10.0f);
@@ -77,10 +75,9 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
-            AllLegsSpeedLimit(SpeedMode_EXTREME);
-            Target_offset2 = 0.112f;
+            AllLegsSpeedLimit(25.0f);
             NewHeartbeat = 5;
-            ChangeGainOfPID(18.5f,0.2f,0.6f,0);
+            ChangeGainOfPID(19.0f,0.08f,0.6f,0);
             ChangeYawOfPID(0.1f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
@@ -88,7 +85,6 @@ void Trot(float direction,int8_t kind)
             break;
         case 2://双木桥
             AllLegsSpeedLimit(SpeedMode_EARLYEX);
-            Target_offset2 = 0.112f;
             NewHeartbeat = 5;
             ChangeGainOfPID(15.5f,0.2f,0.6f,0);
             ChangeYawOfPID(0.35f,0.035f,3000.0f,10.0f);

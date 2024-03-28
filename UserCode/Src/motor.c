@@ -22,7 +22,7 @@ uint8_t merror[MOTOR_ID_NUM];
 uint16_t rec_crc;                    //反馈报文的CRC校验码
 uint16_t uart1_rec_crc;
 float K_P=0.0f,K_W=0.0f;
-float speed_kp = 0.1f;
+float speed_kp = 0.12f;
 
 uint8_t LeftLeg_ReceiverBuffer[MOTOR_RECEIVE_SIZE] = {0};
 uint8_t RightLeg_ReceiverBuffer[MOTOR_RECEIVE_SIZE] = {0};
