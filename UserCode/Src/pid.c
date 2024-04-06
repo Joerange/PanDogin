@@ -151,25 +151,23 @@ void ChangeAllGainOfPID(float sp_kp,float sp_kd,float sp_ki,float pos_kp,float p
     }
 }
 //每个腿的PID的单独配置
-void LegPID_Set(uint8_t LegId,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd)
+void LegPID_Set(uint8_t LegId,float pos_kp,float pos_kd)
 {
-    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId].SpeedLoop,sp_kp,sp_ki,sp_kd);
-    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId].AngleLoop,pos_kp,0,pos_kd);
-    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId+1].SpeedLoop,sp_kp,sp_ki,sp_kd);
-    PID_Set_KP_KI_KD(&DogLegsMotorXPID[2*LegId+1].AngleLoop,pos_kp,0,pos_kd);
+    PID_Set_KP_KI_KD(&AngleLoop[2 * LegId - 1],pos_kp,0,pos_kd);//位置环刚度调整
+    PID_Set_KP_KI_KD(&AngleLoop[2 * LegId],pos_kp,0,pos_kd);//位置环刚度调整
 }
 //前、后腿的PID配置
-void FBLegsPID_Set(uint8_t Leg_FB,float sp_kp,float sp_kd,float sp_ki,float pos_kp,float pos_kd)
+void FBLegsPID_Set(uint8_t Leg_FB,float pos_kp,float pos_kd)
 {
     if(Leg_FB==Leg_Front)
     {
-        LegPID_Set(0,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
-        LegPID_Set(2,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+        LegPID_Set(0,pos_kp,pos_kd);
+        LegPID_Set(2,pos_kp,pos_kd);
     }
     else
     {
-        LegPID_Set(1,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
-        LegPID_Set(3,sp_kp,sp_kd,sp_ki,pos_kp,pos_kd);
+        LegPID_Set(1,pos_kp,pos_kd);
+        LegPID_Set(3,pos_kp,pos_kd);
     }
 }
 /*!
