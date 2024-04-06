@@ -16,7 +16,7 @@ uint8_t IMU_Stand_flag = 0;
 
 void StandUp_Posture(void)
 {
-    ChangeGainOfPID(6.0f,0.2f,0.03f,0.05f);//初始化pid
+    ChangeGainOfPID(5.0f,0.2f,0.03f,0.05f);//初始化pid
     AllLegsSpeedLimit(SpeedMode_VERYFAST);
     Get_Target(0,PI);
     SetCoupledThetaPositionAll();
@@ -52,11 +52,11 @@ void LieDown_Posture(void)
 }
 void MarkingTime(void)
 {
-    AllLegsSpeedLimit(SpeedMode_FAST);
-    ChangeGainOfPID(3.8f,0.2f,0.6f,0);
+    AllLegsSpeedLimit(SpeedMode_VERYFAST);
+    ChangeGainOfPID(10.0f,0.2f,0.6f,0);
 //    ChangeYawOfPID(50.0f,0.5f,2500.0f,10.0f);
 //    YawControl(yawwant, &state_detached_params[2], 1.0f);
-    gait_detached(state_detached_params[2],0.0f, 0.5f, 0.5f, 0.0f,
+    gait_detached(state_detached_params[2],0.0f, 0.4f, 0.4f, 0.0f,
                   1.0f,1.0f,1.0f,1.0f);
 }
 //实际运行Trot步态
@@ -75,9 +75,9 @@ void Trot(float direction,int8_t kind)
                           direction,direction,direction,direction);
             break;
         case 1://大步Trot
-            AllLegsSpeedLimit(25.0f);
+            AllLegsSpeedLimit(30.0f);
             NewHeartbeat = 5;
-            ChangeGainOfPID(19.0f,0.08f,0.6f,0);
+            ChangeGainOfPID(23.0f,0.2f,0.6f,0);
             ChangeYawOfPID(0.1f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,
@@ -114,19 +114,19 @@ void Turn(int state_flag,int speed_flag)
 
     if(speed_flag == 'f')
     {
-        length = 15.0f;
-        state_detached_params[0].detached_params_0.freq = 4.0f;
-        state_detached_params[0].detached_params_1.freq = 4.0f;
-        state_detached_params[0].detached_params_2.freq = 4.0f;
-        state_detached_params[0].detached_params_3.freq = 4.0f;
+        length = 20.0f;
+        state_detached_params[0].detached_params_0.freq = 5.5f;
+        state_detached_params[0].detached_params_1.freq = 5.5f;
+        state_detached_params[0].detached_params_2.freq = 5.5f;
+        state_detached_params[0].detached_params_3.freq = 5.5f;
     }
     else if(speed_flag == 's')
     {
-        length = 5.0f;
-        state_detached_params[0].detached_params_0.freq = 2.0f;
-        state_detached_params[0].detached_params_1.freq = 2.0f;
-        state_detached_params[0].detached_params_2.freq = 2.0f;
-        state_detached_params[0].detached_params_3.freq = 2.0f;
+        length = 4.0f;
+        state_detached_params[0].detached_params_0.freq = 3.2f;
+        state_detached_params[0].detached_params_1.freq = 3.2f;
+        state_detached_params[0].detached_params_2.freq = 3.2f;
+        state_detached_params[0].detached_params_3.freq = 3.2f;
     }
 
     NewHeartbeat = 5;
@@ -252,6 +252,48 @@ void FBwAaLitAir(void)
     osDelay(2000);
 }
 
+void Translate(int direction)
+{
+    switch (direction) {
+        case 'r':
+            AllLegsSpeedLimit(30.0f);
+            NewHeartbeat = 5;
+            ChangeGainOfPID(23.0f,2.3f,0.6f,0);
+            gait_detached(state_detached_params[6],0.5f, 0.5f, 0.0f, 0.0f,
+                          direction,direction,direction,direction);
+            break;
+        case 'l':
+            AllLegsSpeedLimit(30.0f);
+            NewHeartbeat = 5;
+            ChangeGainOfPID(23.0f,2.3f,0.6f,0);
+            gait_detached(state_detached_params[7],0.5f, 0.5f, 0.0f, 0.0f,
+                          direction,direction,direction,direction);
+            break;
+        default:
+            break;
+    }
+}
+
+void WarnPosture(void)//警戒
+{
+    AllLegsSpeedLimit(SpeedMode_EXTREME);
+    //使用刚度小，阻尼大的增益
+    ChangeGainOfPID(8.0f,0.25f,70,0.22);
+    SetPolarPositionAll_Delay(-60,LegLenthMin,700);
+    gpstate=STOP;
+}
+
+void KneelPosture(void)//跪下
+{
+    ChangeGainOfPID(8,0.1f,80,0.22);//恢复正常PD
+    AllLegsSpeedLimit(SpeedMode_SLOW);
+    TargetAngle1=-(199.89f+offset_front_0-180.0f);//-(199.89+offset_front_1-180)
+    TargetAngle2=180.0f-(88.8f-offset_front_1);//180-(88.8-offset_front_1)
+    SetCoupledThetaPositionAll();
+    gpstate = STOP;
+    osDelay(700);
+}
+
 void Race_Competition(void)
 {
     if(Race_count == 0 && Distance >= 115.0f)
@@ -260,7 +302,8 @@ void Race_Competition(void)
     {
         while (IMU_EulerAngle.EulerAngle[Yaw] > -43.0f)
         {
-            Turn('r','f');
+            Turn('r','s');
+//            usart_printf("1\n");
         }
         TargetAngle = -151.5f;
         for (int i = 0; i < 5; ++i) {
@@ -281,7 +324,7 @@ void Race_Competition(void)
     {
         while (IMU_EulerAngle.EulerAngle[Yaw] > -89.6f)
         {
-            Turn('r','f');
+            Turn('r','s');
         }
         TargetAngle = 0;
         for (int i = 0; i < 5; ++i) {
@@ -298,4 +341,116 @@ void Race_Competition(void)
         Trot(Forward,1);
     if(Race_count == 2 && Distance < 105.0f)
         StandUp_Posture();
+}
+
+int ll(void)
+{
+    while(visual.data_8[1] > 96)
+    {
+        Trot(Backward,1);
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    for (int i = 0; i < 300; ++i) {
+        MarkingTime();
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    ExecuteJump(High_Jump,70);
+    osDelay(600);
+    while(visual.data_8[5] < 11 || visual.data_8[5] > 18)
+    {
+        if(visual.data_8[5] < 11)
+            Trot(Forward,2);
+        if(visual.data_8[5] > 18)
+            Trot(Backward,2);
+    }
+    while(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f || IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+    {
+        if(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f)
+            Turn('r','s');
+        if(IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+            Turn('l','s');
+    }
+
+
+
+    StandUp_Posture();
+    osDelay(200);
+
+    for (int i = 0; i < 300; ++i) {
+        MarkingTime();
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    ExecuteJump(High_Jump,70);
+    osDelay(700);
+
+    while(visual.data_8[5] < 11 || visual.data_8[5] > 18)
+    {
+        if(visual.data_8[5] < 11)
+            Trot(Forward,2);
+        if(visual.data_8[5] > 18)
+            Trot(Backward,2);
+    }
+
+    while(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f || IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+    {
+        if(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f)
+            Turn('r','s');
+        if(IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+            Turn('l','s');
+    }
+
+
+
+    StandUp_Posture();
+    osDelay(200);
+
+    for (int i = 0; i < 300; ++i) {
+        MarkingTime();
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    ExecuteJump(High_Jump,70);
+    osDelay(700);
+
+//    while(visual.data_8[5] < 11 || visual.data_8[5] > 18)
+//    {
+//        if(visual.data_8[5] < 11)
+//            Trot(Forward,2);
+//        if(visual.data_8[5] > 18)
+//            Trot(Backward,2);
+//    }
+
+    while(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f || IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+    {
+        if(IMU_EulerAngle.EulerAngle[Yaw] > 0.5f)
+            Turn('r','s');
+        if(IMU_EulerAngle.EulerAngle[Yaw] < -0.5f)
+            Turn('l','s');
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    for (int i = 0; i < 300; ++i) {
+        MarkingTime();
+    }
+
+    StandUp_Posture();
+    osDelay(200);
+
+    ExecuteJump(High_Jump,70);
+
+    return 0;
+
 }

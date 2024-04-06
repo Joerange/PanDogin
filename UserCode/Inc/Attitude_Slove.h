@@ -22,14 +22,14 @@
 #define L1 11.0f //????100mm
 #define L2 22.0f//?ó??200mm
 //腿长限位
-#define LegLenthExtremeMax 32.0f //
-#define LegLenthMax 30.0f //
+#define LegLenthExtremeMax 32.5f //
+#define LegLenthMax 31.0f //
 #define LegLenthMin 12.0f //
 #define LegStandLenth 16.0f //
 #define LegSquatLenth 12.0f //
 //腿长限位
-#define StepLenthMin 8.5f
-#define StepLenthMax 20.0f //大小大概在45cm
+#define StepLenthMin 4.0f
+#define StepLenthMax 32.0f //大小大概在45cm
 #define StepLenthMax_Half (LegLenthExtremeMax*0.866f*0.9f)
 //状态数上限配置
 #define StatesMaxNum 20
@@ -71,7 +71,7 @@ extern float x,y;
 extern float steplen;
 extern uint8_t Mark_flag;
 extern float Target_offset1,Target_offset2;
-extern float yaw_offset;
+extern float offset_front_0,offset_front_1,offset_back_0,offset_back_1;
 
 void Get_Target(int theta1,int theta2);
 void SetCoupledThetaPositionAll(void);

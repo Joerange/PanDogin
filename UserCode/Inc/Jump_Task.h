@@ -20,7 +20,7 @@ enum JumpTypes
 
 extern uint8_t Jump_flag;
 
-void ExecuteJump(uint8_t JumpType,float JumpAngle);
+int ExecuteJump(uint8_t JumpType,float JumpAngle);
 void StairJump(uint8_t stage);
 void SeesawJump(uint8_t stage);
 void FrontFlipJump(uint8_t mode);
