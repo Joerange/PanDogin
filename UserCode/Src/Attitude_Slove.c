@@ -207,6 +207,7 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
     float stepLength = params.step_length ;////步长
     float FREQ = params.freq;////频率
     if(leg_diretion<0) stepLength = -stepLength;////方向控制
+    float time_slope = 0;
     //原始坐标初始化
     float x0=0,y0=0;
     /******相位（时间、周期循环）控制******/
@@ -236,7 +237,50 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
     ////经过坐标系转换后得到最终结果(angle目前都是0，从而x=x0，y=y0)
     x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
     y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
-
+}
+void SinTrajectory_Slope (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId)
+{
+//t=times*5/1000，即每1s变化1
+    //获取正弦函数的所要配置的参数
+    float stanceHeight = params.stance_height;////狗底盘离地高度
+    float downAMP = params.down_amp;////负峰值
+    float upAMP = params.up_amp;////正峰值
+    float flightPercent = params.flight_percent;////摆动相占比
+    float stepLength = params.step_length ;////步长
+    float FREQ = params.freq;////频率
+    if(leg_diretion<0) stepLength = -stepLength;////方向控制
+    float time_slope = 0;
+    //原始坐标初始化
+    float x0=0,y0=0;
+    time_slope = 3 * stepLength * tanf(- IMU_EulerAngle.EulerAngle[Pitch] * PI / 180.0f);
+    //time_slope = 5;
+    /******相位（时间、周期循环）控制******/
+    //相位时间累计(要想实现不同腿不同频率，就不能共用一个这个，而应该将其变为腿部参数特征)。
+    //由于t每次进入函数变化至少0.005，因此FREQ理论上要小于200。否则，p的变化量将大于等于1，从而导致运动出错。
+    //例如当FREQ=1时，每经过1s，t变化1，而p刚好变化1，故此时频率为1Hz，当FREQ=n时，频率显然就为nHz。故频率最大为200Hz。
+    //建议频率不要过大，因为频率越大意味着采样点数越少。而实际上我们不需要那么高频率，应将频率限制在0-5开区间范围内。
+    static float p = 0,prev_t = 0;//频率*时间变化量即为相位变化量。p每次变化所经历的时间是固定的5ms，
+    // 但我们可以通过改变每次变化的大小来间接代替变化频率。FREQ越大，单次变化的就越大。
+    p += FREQ * (t - prev_t);//
+    float gp = fmod((p+gaitOffset),1.0);////该函数返回 x/y 的余数，除1.0表明取小数部分，即将gp限制在0-1范围内。
+    prev_t = t;////将当前t值保存下来。
+    /******正弦轨迹生成******/
+    //足尖摆动相
+    if (gp <= flightPercent) // //gp将从gaitOffset开始，因此当gaitOffset大于flightPercent时，将直接转到支撑相。
+    {
+        x0 = (gp/flightPercent)*stepLength - stepLength/2.0f;////从-stepLength/2到+stepLength/2，移动时间不随stepLength改变，故stepLength越大实际移动速度越快。
+        y0 = -upAMP*sin(PI*gp/flightPercent) + stanceHeight - time_slope*(gp/flightPercent);////围绕stanceHeight为基础进行正弦波动。同样是upAMP越大移动速度越快。
+    }
+        //足尖支撑相
+    else ////摆动总是从正弦轨迹的起始位置处执行。
+    {
+        float percentBack = (gp-flightPercent)/(1.0f-flightPercent);//percentBack与(gp/flightPercent)是一个道理
+        x0 = -percentBack*stepLength + stepLength/2.0f;////一般来说，首次进入时总是从stepLength/2开始，然后之后就向后运动。
+        y0 = downAMP*sin(PI*percentBack) + stanceHeight - time_slope*(1-percentBack);//
+    }
+    ////经过坐标系转换后得到最终结果(angle目前都是0，从而x=x0，y=y0)
+    x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
+    y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
 }
 /*
 * NAME: CoupledMoveLeg
@@ -319,10 +363,14 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 //            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f},
 //            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f}
                 1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-                {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
-                {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
-                {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
-                {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f}
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f}
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f}
         },
         {
             2,//原地踏步//出现多种步态基高差距过大是会失效

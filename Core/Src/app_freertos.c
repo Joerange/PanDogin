@@ -281,8 +281,8 @@ void VisualTask(void const * argument)
   for(;;)
   {
 //        visual_process();
-      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
-              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
+//       usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
+//               ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
 //      if(visual.data_8[1] == 1 && gpstate != 0 && gpstate != 3 && gpstate != 1)
 //          MarkingTime();
 
@@ -361,7 +361,8 @@ void GO_OutputLeftTask(void const * argument)
   {
       leg_pos_controll();
       leg_pos_controll02();
-     osDelay(1);
+      usart_printf("%f,%f\n", x, IMU_EulerAngle.EulerAngle[Pitch]);
+      osDelay(1);
   }
   /* USER CODE END GO_OutputLeftTask */
 }
