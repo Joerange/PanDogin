@@ -77,7 +77,7 @@ void Trot(float direction,int8_t kind)
         case 1://´ó²½Trot
             AllLegsSpeedLimit(30.0f);
             NewHeartbeat = 5;
-            ChangeGainOfPID(23.0f,0.2f,0.6f,0);
+            ChangeGainOfPID(20.0f,0.2f,0.6f,0);
             ChangeYawOfPID(0.1f,0.01f,3000.0f,10.0f);
             YawControl(yawwant, &state_detached_params[1], direction);
             gait_detached(state_detached_params[1],0.0f, 0.5f, 0.5f, 0.0f,

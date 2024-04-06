@@ -84,6 +84,7 @@ void Change_SinStateDetachedParams(DetachedParam *State,int8_t id,int8_t legid,f
                                    float up_amp,float down_amp,float flight_percent,float freq);
 void CartesianToTheta(void);
 void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId);
+void SinTrajectory_Slope (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId);
 void CoupledMoveLeg(float t, GaitParams params,float gait_offset, float leg_direction, int LegId, float angle);
 void AttitudeControl(float roll_set,float pitch_set,float yaw_set,DetachedParam *State_Detached_Params,int direction);
 void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction);

@@ -12,15 +12,17 @@ float step_angle[4] = {0};
 float times = 0.0f;
 float x,y;
 uint8_t reverse_move_flag = 0;
-float steplen = 0;
-float Target_offset1 = 0.088f;
-float Target_offset2 = 0.111f;
-float yaw_offset = 0;
-float offset_front_0 = 0.57f;
-float offset_front_1 = 1.098685f;
-float offset_back_0 = 0.57f;//(-121.9f)
-float offset_back_1 = 1.098685f;//207.2f
+//float offset_front_0 = 0.736f;
+//float offset_front_1 = 1.098685f;
+//float offset_back_0 = 0.736f;//(-121.9f)
+//float offset_back_1 = 1.098685f;//207.2f
 
+float offset_front_0 = 0.62f;
+float offset_front_1 = 0.993f;
+float offset_back_0 = 0.60f;//(-121.9f)
+float offset_back_1 = 0.85f;//207.2f
+
+uint8_t Barrier_flag = 0;
 //用于复制上方状态数组作为永恒基准。
 DetachedParam StateDetachedParams_Copy[StatesMaxNum] = {0};
 //调试时用来改变生成的轨迹参数
@@ -82,8 +84,8 @@ void SetCoupledThetaPositionAll(void)
 
 void SetCoupledThetaPosition(int LegId)
 {
-//    if(Jump_flag == 1)
-//    {
+    if(Barrier_flag == 1)
+    {
         switch(LegId) {
             case 0:
                 AngleWant_MotorX[1] = -TargetAngle2 + offset_front_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
@@ -91,45 +93,43 @@ void SetCoupledThetaPosition(int LegId)
                 break;
             case 1:
                 AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//+5.0f
-                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI + Roll_PID_Loop.Out_put;
+                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
                 break;
             case 2:
-                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;//-4.0f
+                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI ;//-4.0f
                 AngleWant_MotorX[6] = TargetAngle2 - offset_front_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
                 break;
             case 3:
                 AngleWant_MotorX[7] = TargetAngle1 - offset_back_0 + IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
-                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI + Roll_PID_Loop.Out_put;
+                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1 - IMU_EulerAngle.EulerAngle[Pitch] / 180 * PI;
                 break;
             default:
                 break;
         }
-//    }
-//    else if(Jump_flag == 0)
-//    {
-//        switch(LegId) {
-//            case 0:
-//                AngleWant_MotorX[1] = -TargetAngle2 + offset_front_1;
-////                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0;
-//                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0 + Target_offset1;
-//                break;
-//            case 1:
-//                AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1;//+5.0f
-////                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0;
-//                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0 + Target_offset2;
-//                break;
-//            case 2:
-//                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0;//-4.0f
-//                AngleWant_MotorX[6] = TargetAngle2 - offset_front_1;
-//                break;
-//            case 3:
-//                AngleWant_MotorX[7] = TargetAngle1 - offset_back_0;
-//                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1;
-//                break;
-//            default:
-//                break;
-//        }
-//    }
+    }
+    else if(Barrier_flag == 0)
+    {
+        switch(LegId) {
+            case 0:
+                AngleWant_MotorX[1] = -TargetAngle2 + offset_front_1;
+                AngleWant_MotorX[2] = -TargetAngle1 + offset_front_0;
+                break;
+            case 1:
+                AngleWant_MotorX[3] = -TargetAngle2 + offset_back_1;//+5.0f
+                AngleWant_MotorX[4] = -TargetAngle1 + offset_back_0;
+                break;
+            case 2:
+                AngleWant_MotorX[5] = TargetAngle1 - offset_front_0 ;
+                AngleWant_MotorX[6] = TargetAngle2 - offset_front_1;
+                break;
+            case 3:
+                AngleWant_MotorX[7] = TargetAngle1 - offset_back_0 ;
+                AngleWant_MotorX[8] = TargetAngle2 - offset_back_1;
+                break;
+            default:
+                break;
+        }
+    }
 
     //注意角度赋值根据不同的电机顺序和正负不同，同时也受机械结果安装的影响。若有改动，则这里的角度的对应关系也要变。
     /*
@@ -207,6 +207,7 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
     float stepLength = params.step_length ;////步长
     float FREQ = params.freq;////频率
     if(leg_diretion<0) stepLength = -stepLength;////方向控制
+    float time_slope = 0;
     //原始坐标初始化
     float x0=0,y0=0;
     /******相位（时间、周期循环）控制******/
@@ -236,8 +237,50 @@ void SinTrajectory (float t,GaitParams params, float gaitOffset,float leg_direti
     ////经过坐标系转换后得到最终结果(angle目前都是0，从而x=x0，y=y0)
     x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
     y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
-    //usart_printf("%f, %f\n", x, y);
-
+}
+void SinTrajectory_Slope (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId)
+{
+//t=times*5/1000，即每1s变化1
+    //获取正弦函数的所要配置的参数
+    float stanceHeight = params.stance_height;////狗底盘离地高度
+    float downAMP = params.down_amp;////负峰值
+    float upAMP = params.up_amp;////正峰值
+    float flightPercent = params.flight_percent;////摆动相占比
+    float stepLength = params.step_length ;////步长
+    float FREQ = params.freq;////频率
+    if(leg_diretion<0) stepLength = -stepLength;////方向控制
+    float time_slope = 0;
+    //原始坐标初始化
+    float x0=0,y0=0;
+    time_slope = 3 * stepLength * tanf(- IMU_EulerAngle.EulerAngle[Pitch] * PI / 180.0f);
+    //time_slope = 5;
+    /******相位（时间、周期循环）控制******/
+    //相位时间累计(要想实现不同腿不同频率，就不能共用一个这个，而应该将其变为腿部参数特征)。
+    //由于t每次进入函数变化至少0.005，因此FREQ理论上要小于200。否则，p的变化量将大于等于1，从而导致运动出错。
+    //例如当FREQ=1时，每经过1s，t变化1，而p刚好变化1，故此时频率为1Hz，当FREQ=n时，频率显然就为nHz。故频率最大为200Hz。
+    //建议频率不要过大，因为频率越大意味着采样点数越少。而实际上我们不需要那么高频率，应将频率限制在0-5开区间范围内。
+    static float p = 0,prev_t = 0;//频率*时间变化量即为相位变化量。p每次变化所经历的时间是固定的5ms，
+    // 但我们可以通过改变每次变化的大小来间接代替变化频率。FREQ越大，单次变化的就越大。
+    p += FREQ * (t - prev_t);//
+    float gp = fmod((p+gaitOffset),1.0);////该函数返回 x/y 的余数，除1.0表明取小数部分，即将gp限制在0-1范围内。
+    prev_t = t;////将当前t值保存下来。
+    /******正弦轨迹生成******/
+    //足尖摆动相
+    if (gp <= flightPercent) // //gp将从gaitOffset开始，因此当gaitOffset大于flightPercent时，将直接转到支撑相。
+    {
+        x0 = (gp/flightPercent)*stepLength - stepLength/2.0f;////从-stepLength/2到+stepLength/2，移动时间不随stepLength改变，故stepLength越大实际移动速度越快。
+        y0 = -upAMP*sin(PI*gp/flightPercent) + stanceHeight - time_slope*(gp/flightPercent);////围绕stanceHeight为基础进行正弦波动。同样是upAMP越大移动速度越快。
+    }
+        //足尖支撑相
+    else ////摆动总是从正弦轨迹的起始位置处执行。
+    {
+        float percentBack = (gp-flightPercent)/(1.0f-flightPercent);//percentBack与(gp/flightPercent)是一个道理
+        x0 = -percentBack*stepLength + stepLength/2.0f;////一般来说，首次进入时总是从stepLength/2开始，然后之后就向后运动。
+        y0 = downAMP*sin(PI*percentBack) + stanceHeight - time_slope*(1-percentBack);//
+    }
+    ////经过坐标系转换后得到最终结果(angle目前都是0，从而x=x0，y=y0)
+    x =  cos(angle*PI/180)*x0 + sin(angle*PI/180)*y0;
+    y = -sin(angle*PI/180)*x0 + cos(angle*PI/180)*y0;
 }
 /*
 * NAME: CoupledMoveLeg
@@ -302,10 +345,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
         {
                 0,//转弯（在转弯函数中会调整该步态以实现转弯）
-                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
-                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},
-                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
-                {18.0f, 6.25f, 2.0f, 1.5f, 0.4f, 4.0f}
+                {18.0f, 6.25f, 3.0f, 0.3f, 0.3f, 4.0f},
+                {18.0f, 6.25f, 3.0f, 0.3f, 0.3f, 4.0f},
+                {18.0f, 6.25f, 3.0f, 0.3f, 0.3f, 4.0f},// 6个参数变量为stance_height; step_length; up_amp; down_amp; flight_percent; freq
+                {18.0f, 6.25f, 3.0f, 0.3f, 0.3f, 4.0f}
 //                0,//转弯（在转弯函数中会调整该步态以实现转弯）
 //                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
 //                {18.0f, 6.25f, 1.0f, 1.0f, 0.25f, 4.0f},
@@ -315,22 +358,26 @@ DetachedParam state_detached_params[StatesMaxNum] = {
         {
 
 //            1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
-//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
-//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f},
-//            {22.5f, 21.0f,  2.5f, 0.5f, 0.32f, 5.5f}
+//            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f},
+//            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f},
+//            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f},
+//            {21.0f, 25.0f,  6.8f, 0.15f, 0.3f, 4.5f}
                 1,//大步Trot（快速）,现在最高点y轴坐标应该大于15，最大不超过32
-                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
-                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
-                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f},
-                {19.0f, 13.0f,  2.5f, 0.5f, 0.32f, 4.0f}
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f},
+                // {19.0f, 12.0f,  3.0f, 0.6f, 0.32f, 2.0f}
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f},
+                {20.0f, 8.0f,  1.5f, 0.1f, 0.32f, 2.0f}
         },
         {
             2,//原地踏步//出现多种步态基高差距过大是会失效
-            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
-            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
-            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f},
-            {16.0f, 0.0f,  0.8f, 11.0f, 0.25f, 2.0f}
+            {18.0f, 0.05f,  5.0f, 1.0f, 0.3f, 3.0f},
+            {18.0f, 0.05f,  5.0f, 1.0f, 0.3f, 3.0f},
+            {18.0f, 0.05f,  5.0f, 1.0f, 0.3f, 3.0f},
+            {18.0f, 0.05f,  5.0f, 1.0f, 0.3f, 3.0f}
         },
         {
             3,//Walk步态（没有调好）
@@ -345,10 +392,10 @@ DetachedParam state_detached_params[StatesMaxNum] = {
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f},
             {20.0f, 15.0f,  1.5f, 1.0f, 0.18f, 2.0f}*/
-                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 2.0f},
-                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 2.0f},
-                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 2.0f},
-                {19.0f, 10.0f,  2.0f, 0.2f, 0.3f, 2.0f}
+                {18.0f, 6.50f,  3.5f, 0.2f, 0.3f, 2.0f},
+                {18.0f, 6.50f,  3.5f, 0.2f, 0.3f, 2.0f},
+                {18.0f, 6.50f,  3.5f, 0.2f, 0.3f, 2.0f},
+                {18.0f, 6.50f,  3.5f, 0.2f, 0.3f, 2.0f}
 
         },
         {
@@ -362,6 +409,20 @@ DetachedParam state_detached_params[StatesMaxNum] = {
 
 
         },
+        {
+                6,//左微
+                {15.0f, 0.0f,  1.0f, 0.2f, 0.2f, 3.8f},
+                {15.0f, 0.0f,  1.0f, 0.2f, 0.2f, 3.8f},
+                {19.0f, 0.0f,  5.0f, 0.2f, 0.2f, 3.8f},
+                {19.0f, 0.0f,  5.0f, 0.2f, 0.2f, 3.8f}
+        },
+        {
+                7,//右微
+                {19.0f, 0.0f,  5.0f, 0.2f, 0.2f, 3.8f},
+                {19.0f, 0.0f,  5.0f, 0.2f, 0.2f, 3.8f},
+                {15.0f, 0.0f,  1.0f, 0.2f, 0.2f, 3.8f},
+                {15.0f, 0.0f,  1.0f, 0.2f, 0.2f, 3.8f}
+        }
 };
 
 
@@ -371,6 +432,7 @@ void YawControl(float yaw_set,DetachedParam *State_Detached_Params,int direction
     float normal_step_left = 0,normal_step_right = 0;
     if(IMU_Control_Flag)
     {
+        ChangeYawOfPID(0.6f,0.06f,3000.0f,10.0f);
         /*******IMUのPID相关*******/
         //PID目标设定（一般都是0，除了Pitch有时要求它是一定角度）
         SetPoint_IMU(&Yaw_PID_Loop,yaw_set);
@@ -450,10 +512,11 @@ void SetCoupledCartesianPosition(int LegId,float x_want,float y_want)
 //所有腿的直角坐标控制
 void SetCartesianPositionAll_Delay(float x_want,float y_want,uint16_t delaytime)
 {
-    SetCoupledCartesianPosition(0,x_want,y_want);
+
+    SetCoupledCartesianPosition(3,x_want,y_want);
     SetCoupledCartesianPosition(1,x_want,y_want);
     SetCoupledCartesianPosition(2,x_want,y_want);
-    SetCoupledCartesianPosition(3,x_want,y_want);
+    SetCoupledCartesianPosition(0,x_want,y_want);
 
     osDelay(delaytime);
 }
@@ -515,4 +578,12 @@ void ReverseMoveOpen(void)
 void ReverseMoveClose(void)
 {
     reverse_move_flag=0;
+}
+
+void IMU_Slove(uint8_t flag)
+{
+    if(flag == 1)
+        Barrier_flag = 1;
+    else if(flag == 0)
+        Barrier_flag = 0;
 }
