@@ -64,32 +64,50 @@ void Remote_Controller(void)
         case 1:
              StandUp_Posture();
             break;
+        case 2://¹òÏÂ
+            KneelPosture();
+            break;
         case 3:
             LieDown_Posture();
             break;
         case 6:
-            Turn('l','s');
+            if(dpstate == 53)
+            {
+                Translate('l');
+            }
+            else
+            {
+                Turn('l','s');
+            }
+
             break;
         case 7:
-            Turn('r','s');
+            if(dpstate == 53)
+            {
+                Translate('r');
+            }
+            else
+            {
+                Turn('r','s');
+            }
             break;
         case 10:
-            Trot(Forward,2);
+            Trot(Forward,1);
             break;
         case 11:
-            Trot(Backward,2);
+            Trot(Backward,1);
             break;
         case 20:
-            ExecuteJump(Standard_Jump,60);
+            ExecuteJump(Standard_Jump,70);
             break;
         case 21:
-            ExecuteJump(High_Jump,75);
+            ExecuteJump(High_Jump,70);
             break;
         case 22:
             ExecuteJump(Far_Jump,70);
             break;
         case 24://·ÉÌø
-            Bridge_Jump(0);
+            ExecuteJump(Leap_Jump,75);
             break;
         case 30:
             SquatPosture();//¶×ÏÂ
@@ -103,8 +121,14 @@ void Remote_Controller(void)
         case 33:
             MarkingTime();//Ì¤²½
             break;
+        case 36:
+            ll();
+            break;
         case 37:
             Race_Competition();
+            break;
+        case 41://¾¯½ä
+            WarnPosture();
             break;
         default:
             break;

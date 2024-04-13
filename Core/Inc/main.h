@@ -43,6 +43,7 @@ extern "C" {
 #include <math.h>
 #include "Jump_Task.h"
 #include "visual.h"
+#include "24l01.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -68,12 +69,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define NRF_CE_Pin GPIO_PIN_3
-#define NRF_CE_GPIO_Port GPIOE
-#define NRF_CSN_Pin GPIO_PIN_4
-#define NRF_CSN_GPIO_Port GPIOE
-#define NRF_IRQ_Pin GPIO_PIN_13
-#define NRF_IRQ_GPIO_Port GPIOC
+#define SPI4_CE_Pin GPIO_PIN_3
+#define SPI4_CE_GPIO_Port GPIOE
+#define SPI4_NSS_Pin GPIO_PIN_4
+#define SPI4_NSS_GPIO_Port GPIOE
+#define SPI4_IRQ_Pin GPIO_PIN_13
+#define SPI4_IRQ_GPIO_Port GPIOC
 #define Key_Pin GPIO_PIN_10
 #define Key_GPIO_Port GPIOE
 #define LED1_Pin GPIO_PIN_12

@@ -362,7 +362,6 @@ void USART1_IRQHandler(void)
             }
 
         }
-        //memset(UART6_DMA_REbuffer,0x00,sizeof(UART6_DMA_REbuffer));//清除数组接受到的数据
     }
     HAL_UART_Receive_DMA(&huart1, (uint8_t *)&LeftLeg_ReceiverBuffer, MOTOR_RECEIVE_SIZE);//重新使能DMA接受，继续下1轮recieve
 

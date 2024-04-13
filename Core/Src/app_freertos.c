@@ -281,8 +281,8 @@ void VisualTask(void const * argument)
   for(;;)
   {
 //        visual_process();
-//       usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
-//               ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
+      usart_printf("%d,%d,%d,%d,%d,%d\n",visual.data_8[0],visual.data_8[1],visual.data_8[2]
+              ,visual.data_8[3],visual.data_8[4],visual.data_8[5]);
 //      if(visual.data_8[1] == 1 && gpstate != 0 && gpstate != 3 && gpstate != 1)
 //          MarkingTime();
 
@@ -330,8 +330,8 @@ void TripodHeadTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-      // SetPoint_IMU(&Roll_PID_Loop,0);
-      // PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
+      SetPoint_IMU(&Roll_PID_Loop,0);
+      PID_PosLocM2006(&Roll_PID_Loop,IMU_EulerAngle.EulerAngle[Roll]);
 
       SetPoint_IMU(&M2006_Position, AngleChange(TargetAngle));
       PID_PosLocM2006(&M2006_Position,struct_debug1[0].total_angle);
@@ -361,8 +361,7 @@ void GO_OutputLeftTask(void const * argument)
   {
       leg_pos_controll();
       leg_pos_controll02();
-      usart_printf("%f,%f\n", x, IMU_EulerAngle.EulerAngle[Pitch]);
-      osDelay(1);
+     osDelay(1);
   }
   /* USER CODE END GO_OutputLeftTask */
 }

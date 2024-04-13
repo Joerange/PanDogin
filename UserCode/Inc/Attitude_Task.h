@@ -100,6 +100,7 @@ extern float TargetAngle;
 extern int Race_count;
 extern uint8_t IMU_Stand_flag;
 extern uint8_t delay_flag;
+extern uint8_t Solpe_flag;
 
 void MarkingTime(void);
 void StandUp_Posture(void);

@@ -96,5 +96,7 @@ void ReverseMoveClose(void);
 void SetCartesianPositionFB_Delay(int Leg_FB,float x_want,float y_want,uint16_t delaytime);
 void SetPolarPositionFB_Delay(uint8_t Legs_FB, float polar_angle,float polar_diameter,uint16_t delaytime);
 void IMU_Slove(uint8_t flag);
+void SinTrajectory_Slope (float t,GaitParams params, float gaitOffset,float leg_diretion,float angle,int LegId);
+void SetPolarPosition_Delay(int8_t leg_id,float polar_angle,float polar_diameter,uint16_t delaytime);
 
 #endif //MY_SCUDOG_ATTITUDE_SLOVE_H
